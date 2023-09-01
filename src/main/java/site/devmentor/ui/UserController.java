@@ -18,7 +18,7 @@ import site.devmentor.exception.user.DuplicateUserIdException;
 
 @Validated
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
   private final UserService userService;

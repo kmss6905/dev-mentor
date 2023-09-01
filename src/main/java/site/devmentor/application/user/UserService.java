@@ -1,8 +1,8 @@
 package site.devmentor.application.user;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.devmentor.application.PasswordService;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.user.UserCreateRequest;
@@ -14,17 +14,17 @@ import site.devmentor.exception.user.DuplicateUserIdException;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final PasswordService passwordService;
+  private final PasswordEncoder passwordEncoder;
 
-  public UserService(UserRepository userRepository, PasswordService passwordService) {
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
-    this.passwordService = passwordService;
+    this.passwordEncoder = passwordEncoder;
   }
 
 
   public void join(UserCreateRequest request) {
     verifyUniqueUserIdAndEmail(request);
-    String encryptPwd = passwordService.encrpyt(request.getPassword());
+    String encryptPwd = passwordEncoder.encode(request.getPassword());
     User encryptedUser = request.toEntity(encryptPwd);
     userRepository.save(encryptedUser);
   }
