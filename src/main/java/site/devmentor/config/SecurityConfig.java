@@ -58,10 +58,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                     authorizationManagerRequestMatcherRegistry
                             .requestMatchers(
-                                    antMatcher(POST, "/login"),
-                                    antMatcher(POST, "/user"),
-                                    antMatcher(GET, "/user/*/exists"),
-                                    antMatcher(GET, "/user/email/*/exists")
+                                    antMatcher(POST, "/api/login"),
+                                    antMatcher(POST, "/api/user"),
+                                    antMatcher(GET, "/api/user/*/exists"),
+                                    antMatcher(GET, "/api/user/email/*/exists")
                             ).permitAll()
                             .anyRequest().authenticated());
 
