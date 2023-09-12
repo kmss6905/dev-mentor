@@ -41,14 +41,20 @@ public class User extends BaseEntity {
   }
 
   public void updateProfile(UserProfileRequest userProfileRequest) {
-    if (profileIsEmpty()) {
-      this.profile = new UserProfile(userProfileRequest.content());
+    if (isProfileNotEmpty()) {
+      this.profile.update(userProfileRequest.content());
       return;
     }
-    this.profile.update(userProfileRequest.content());
+    this.profile = new UserProfile(userProfileRequest.content());
   }
 
-  private boolean profileIsEmpty() {
-    return this.profile == null;
+  private boolean isProfileNotEmpty() {
+    return this.profile != null;
+  }
+
+  public void deleteProfile() {
+    if (isProfileNotEmpty()) {
+      this.profile = null;
+    }
   }
 }
