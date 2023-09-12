@@ -4,7 +4,7 @@ services:
     container_name: "db"
     image: mysql:8
     volumes:
-      - ./db/mysql:/var/lib/mysql
+      - ./db/mysql:/var/lib/mysql1
       - ./db/sql:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: devmentor123

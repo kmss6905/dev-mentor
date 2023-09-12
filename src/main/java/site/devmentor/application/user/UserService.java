@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.exception.user.DuplicateEmailException;
 import site.devmentor.exception.user.DuplicateUserIdException;
 

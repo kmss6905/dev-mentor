@@ -9,9 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.user.UserService;
+import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.LoginUser;
 import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
+import site.devmentor.dto.user.response.UserProfileDto;
 import site.devmentor.exception.user.DuplicateEmailException;
 import site.devmentor.exception.user.DuplicateUserIdException;
 

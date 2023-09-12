@@ -12,7 +12,7 @@ import site.devmentor.acceptance.AcceptanceTest;
 import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
