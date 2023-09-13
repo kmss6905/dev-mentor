@@ -11,11 +11,14 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 
+import java.util.Arrays;
+
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
-    return parameter.getAnnotatedElement().equals(LoginUser.class)
-            && parameter.getParameterType().equals(AuthenticatedUser.class);
+    return parameter.getParameterType().equals(AuthenticatedUser.class)
+            && Arrays.stream(parameter.getParameterAnnotations())
+            .anyMatch(it -> it.annotationType().equals(LoginUser.class));
   }
 
   @Override

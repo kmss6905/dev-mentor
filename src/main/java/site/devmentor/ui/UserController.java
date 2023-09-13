@@ -15,7 +15,6 @@ import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.dto.user.request.UserProfileRequest;
-import site.devmentor.dto.user.response.UserProfileDto;
 import site.devmentor.dto.user.response.UserProfileResponse;
 import site.devmentor.exception.user.DuplicateEmailException;
 import site.devmentor.exception.user.DuplicateUserIdException;

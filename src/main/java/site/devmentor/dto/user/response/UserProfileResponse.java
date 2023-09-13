@@ -2,6 +2,7 @@ package site.devmentor.dto.user.response;
 
 import lombok.Builder;
 import site.devmentor.domain.user.User;
+import site.devmentor.util.DateUtils;
 
 public record UserProfileResponse(long id, String userId, String content, String createdAt, String updatedAt) {
   public static UserProfileResponse from(User user) {
@@ -9,8 +10,8 @@ public record UserProfileResponse(long id, String userId, String content, String
             .id(user.getId())
             .userId(user.getUserId())
             .content(user.getProfile().getContent())
-            .createdAt(user.getCreatedAt().toString())
-            .updatedAt(user.getUpdatedAt().toString())
+            .createdAt(DateUtils.toStandardDateFormat(user.getCreatedAt()))
+            .updatedAt(DateUtils.toStandardDateFormat(user.getUpdatedAt()))
             .build();
   }
 
