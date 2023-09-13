@@ -1,4 +1,4 @@
-package site.devmentor.dto.user;
+package site.devmentor.dto.user.request;
 
 
 import jakarta.validation.constraints.Email;

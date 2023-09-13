@@ -1,22 +1,28 @@
 package site.devmentor.acceptance.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import site.devmentor.acceptance.AcceptanceTest;
 import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserAcceptanceTest extends AcceptanceTest {
 
   @Autowired
+  private WebApplicationContext context;
+
   private MockMvc mockMvc;
 
   @Autowired
@@ -36,6 +44,10 @@ public class UserAcceptanceTest extends AcceptanceTest {
   void init() {
     userRepository.deleteAll();
     assertThat(userRepository.findAll()).isEmpty();
+    this.mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
   }
 
   @Test
@@ -189,6 +201,60 @@ public class UserAcceptanceTest extends AcceptanceTest {
             .andExpect(status().isUnauthorized());
   }
 
+  @Test
+  void 프로필_생성_성공() throws Exception {
+    User user = saveUserAndGet("kmss69052", "kmss69052@naver.com", "kmss69052");
+    Matcher<String> datetimeMacher = Matchers.matchesRegex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+    this.mockMvc.perform(patch("/api/user/profile")
+                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
+                    .content("""
+                            {
+                              "content": "안녕하세요"
+                            }
+                            """)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(user.getId()))
+            .andExpect(jsonPath("$.userId").value(user.getUserId()))
+            .andExpect(jsonPath("$.content").value("안녕하세요"))
+            .andExpect(jsonPath("$.createdAt", datetimeMacher))
+            .andExpect(jsonPath("$.updatedAt", datetimeMacher));
+  }
+
+  @Test
+  void 프로필_삭제_성공() throws Exception {
+    // given
+    User user = saveUserAndGet("kmss69052", "kmss69052@naver.com", "kmss69052");
+    Matcher<String> datetimeMacher = Matchers.matchesRegex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+    this.mockMvc.perform(patch("/api/user/profile")
+                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
+                    .content("""
+                            {
+                              "content": "안녕하세요"
+                            }
+                            """)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(user.getId()))
+            .andExpect(jsonPath("$.userId").value(user.getUserId()))
+            .andExpect(jsonPath("$.content").value("안녕하세요"))
+            .andExpect(jsonPath("$.createdAt", datetimeMacher))
+            .andExpect(jsonPath("$.updatedAt", datetimeMacher));
+
+
+    // when, then
+    this.mockMvc.perform(delete("/api/user/profile")
+                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").value(true));
+  }
+
   private void saveOneUser(String userId, String email) {
     userRepository.save(
             User.builder()
@@ -200,6 +266,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
   private void saveUser(String userId, String email, String password) {
     userRepository.save(
+            User.builder()
+                    .userId(userId)
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .build());
+  }
+
+  private User saveUserAndGet(String userId, String email, String password) {
+    return userRepository.save(
             User.builder()
                     .userId(userId)
                     .email(email)

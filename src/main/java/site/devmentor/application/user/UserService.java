@@ -1,14 +1,20 @@
 package site.devmentor.application.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
+import site.devmentor.dto.user.request.UserProfileRequest;
+import site.devmentor.dto.user.response.UserProfileResponse;
 import site.devmentor.exception.user.DuplicateEmailException;
 import site.devmentor.exception.user.DuplicateUserIdException;
+import site.devmentor.exception.user.UserNotFoundException;
 
+@Slf4j
 @Service
 @Transactional
 public class UserService {
@@ -57,5 +63,22 @@ public class UserService {
     if (existed) {
       throw new DuplicateEmailException(email);
     }
+  }
+
+  public UserProfileResponse updateProfile(AuthenticatedUser authUser, UserProfileRequest profileRequest) {
+    User user = findUser(authUser);
+    user.updateProfile(profileRequest);
+    return UserProfileResponse.from(user);
+  }
+
+  public void deleteProfile(AuthenticatedUser authUser) {
+    User user = findUser(authUser);
+    user.deleteProfile();
+  }
+
+
+  private User findUser(AuthenticatedUser authUser) {
+    return userRepository.findById(authUser.userPid())
+            .orElseThrow(UserNotFoundException::new);
   }
 }

@@ -9,9 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.user.UserService;
+import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.LoginUser;
 import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
-import site.devmentor.dto.user.UserCreateRequest;
+import site.devmentor.dto.user.request.UserCreateRequest;
+import site.devmentor.dto.user.request.UserProfileRequest;
+import site.devmentor.dto.user.response.UserProfileResponse;
 import site.devmentor.exception.user.DuplicateEmailException;
 import site.devmentor.exception.user.DuplicateUserIdException;
 
@@ -57,6 +61,22 @@ public class UserController {
     if (isExistEmail) {
       throw new DuplicateEmailException(email);
     }
+    return ResponseUtil.ok();
+  }
+
+  @PatchMapping("/profile")
+  public ResponseEntity<UserProfileResponse> updateProfile(
+          @LoginUser AuthenticatedUser authUser,
+          @RequestBody UserProfileRequest profileRequest) {
+    UserProfileResponse userProfileResponse =  userService.updateProfile(authUser, profileRequest);
+    return ResponseEntity.ok(userProfileResponse);
+  }
+
+  @DeleteMapping("/profile")
+  public ResponseEntity<Response> deleteProfile(
+          @LoginUser AuthenticatedUser authUser
+  ) {
+    userService.deleteProfile(authUser);
     return ResponseUtil.ok();
   }
 }
