@@ -79,6 +79,6 @@ public class UserService {
 
   private User findUser(AuthenticatedUser authUser) {
     return userRepository.findById(authUser.userPid())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(() -> new UserNotFoundException(String.valueOf(authUser.userPid())));
   }
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.exception.UnauthorizedAccessException;
@@ -15,9 +17,14 @@ import java.util.Objects;
 @Entity
 @Table(name = "POST")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE POST SET is_deleted = true WHERE id=?")
+@Where(clause = "is_deleted=false")
 public class Post extends BaseEntity {
 
+  @Column(nullable = false)
   private String content;
+
+  @Column(nullable = false)
   private String title;
 
   @Column(name = "is_deleted")

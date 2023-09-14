@@ -6,6 +6,7 @@ import site.devmentor.application.post.PostService;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
+import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.post.response.PostCreateResponse;
 
@@ -38,5 +39,14 @@ public class PostController {
           @RequestBody PostCreateUpdateRequest updateRequest) {
     return ResponseEntity.ok(postService
             .update(id, updateRequest));
+  }
+
+  @AuthorAccessOnly
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> delete(
+          @PathVariable long id
+  ) {
+    postService.delete(id);
+    return ResponseUtil.ok();
   }
 }
