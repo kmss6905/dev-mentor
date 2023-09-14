@@ -21,6 +21,7 @@ public class PostService {
   public PostCreateResponse create(AuthenticatedUser authUser, PostCreateRequest postCreateRequest) {
     Post post = Post.builder()
             .userPid(authUser.userPid())
+            .title(postCreateRequest.title())
             .content(postCreateRequest.content())
             .build();
     Post postSaved = postRepository.save(post);

@@ -9,10 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import site.devmentor.acceptance.AcceptanceTest;
 import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.user.User;
@@ -29,22 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserAcceptanceTest extends AcceptanceTest {
 
   @Autowired
-  private WebApplicationContext context;
-
-  private MockMvc mockMvc;
-
-  @Autowired
   private UserRepository userRepository;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
 
   @BeforeEach
-  void init() {
-    this.mockMvc = MockMvcBuilders
-            .webAppContextSetup(context)
-            .apply(SecurityMockMvcConfigurers.springSecurity())
-            .build();
+  void deleteUser() {
+    userRepository.deleteAll();
   }
 
   @Test
@@ -54,7 +42,7 @@ public class UserAcceptanceTest extends AcceptanceTest {
     String userSignUpRequestAsString = new ObjectMapper().writeValueAsString(userCreateRequest);
 
     // when, then
-    this.mockMvc.perform(post("/api/user")
+    mockMvc.perform(post("/api/user")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(userSignUpRequestAsString))
             .andExpect(status().isOk())
