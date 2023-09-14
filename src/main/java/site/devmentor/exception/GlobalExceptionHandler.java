@@ -2,6 +2,7 @@ package site.devmentor.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +28,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(DuplicateException.class)
   public ResponseEntity<ErrorResponse> handleDuplicationExceptions(DuplicateException ex) {
-    System.out.println(ex.getMessage());
     return ResponseEntity.badRequest().body(ErrorResponse.of(ex.getMessage()));
   }
+
+  @ExceptionHandler(UnauthorizedAccessException.class)
+  public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(ex.getMessage()));
+  }
+
 }
