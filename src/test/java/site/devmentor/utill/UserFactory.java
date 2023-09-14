@@ -3,11 +3,11 @@ package site.devmentor.utill;
 import site.devmentor.domain.user.User;
 
 public class UserFactory {
-  public static User user() {
+  public static User user(String userId) {
     return User.builder()
-            .userId("user123")
-            .email("user1@gmail.io")
-            .password("user1password!")
+            .userId(userId)
+            .email(userId + "@gmail.io")
+            .password("samplePassword")
             .build();
   }
 }
