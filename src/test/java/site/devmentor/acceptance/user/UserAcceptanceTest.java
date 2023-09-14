@@ -19,7 +19,6 @@ import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.user.request.UserCreateRequest;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,8 +41,6 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
   @BeforeEach
   void init() {
-    userRepository.deleteAll();
-    assertThat(userRepository.findAll()).isEmpty();
     this.mockMvc = MockMvcBuilders
             .webAppContextSetup(context)
             .apply(SecurityMockMvcConfigurers.springSecurity())
