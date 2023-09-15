@@ -1,20 +1,14 @@
 package site.devmentor.dto.comment;
 
 import lombok.Builder;
+import lombok.Getter;
 import site.devmentor.domain.comment.Comment;
 import site.devmentor.util.DateUtils;
 
-public class CommentCreateResponse {
-
-  private long commentId;
-  private String comment;
-  private String createdAt;
+public record CommentCreateResponse(long commentId, String comment, String createdAt) {
 
   @Builder
-  public CommentCreateResponse(final long commentId, final String comment, final String createdAt) {
-    this.commentId = commentId;
-    this.comment = comment;
-    this.createdAt = createdAt;
+  public CommentCreateResponse {
   }
 
   public static CommentCreateResponse from(Comment comment) {

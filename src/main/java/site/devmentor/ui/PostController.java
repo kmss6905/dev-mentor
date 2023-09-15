@@ -8,6 +8,7 @@ import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.comment.CommentCreateDto;
+import site.devmentor.dto.comment.CommentCreateResponse;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.post.response.PostCreateResponse;
 
@@ -52,12 +53,12 @@ public class PostController {
   }
 
   @PostMapping("/{postId}/comments")
-  public ResponseEntity<?> replyComment(
+  public ResponseEntity<CommentCreateResponse> replyComment(
           @LoginUser AuthenticatedUser authUser,
           @RequestBody CommentCreateDto commentCreateDto,
           @PathVariable long postId
   ) {
-    return ResponseEntity.created(URI.create("/api/posts/" + postId + "/comments"))
-            .body(postService.replyComment(authUser, commentCreateDto, postId));
+    CommentCreateResponse commentCreateResponse = postService.replyComment(authUser, commentCreateDto, postId);
+    return ResponseEntity.ok(commentCreateResponse);
   }
 }
