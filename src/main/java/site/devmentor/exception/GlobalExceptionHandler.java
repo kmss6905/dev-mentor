@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import site.devmentor.exception.common.ErrorResponse;
+import site.devmentor.exception.post.PostNotFoundException;
 
 
 @Slf4j
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UnauthorizedAccessException.class)
   public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(ex.getMessage()));
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(ResourceNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.of(ex.getMessage()));
   }
 
 }

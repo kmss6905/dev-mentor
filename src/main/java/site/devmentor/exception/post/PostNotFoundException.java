@@ -1,7 +1,11 @@
 package site.devmentor.exception.post;
 
-public class PostNotFoundException extends RuntimeException{
-  public PostNotFoundException(String message) {
-    super(message);
+import site.devmentor.exception.ResourceNotFoundException;
+
+public class PostNotFoundException extends ResourceNotFoundException {
+
+
+  public PostNotFoundException(String id) {
+    super("게시글을 찾을 수 없습니다. 게시글 번호 : " + id);
   }
 }

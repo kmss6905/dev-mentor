@@ -40,8 +40,12 @@ public class PostService {
             DateUtils.toStandardDateFormat(post.getUpdatedAt()));
   }
 
+  public void delete(long id) {
+    postRepository.deleteById(id);
+  }
+
   private Post findPost(long postId) {
     return postRepository.findById(postId)
-            .orElseThrow(() -> new PostNotFoundException("cant find post id " + postId));
+            .orElseThrow(() -> new PostNotFoundException(String.valueOf(postId)));
   }
 }

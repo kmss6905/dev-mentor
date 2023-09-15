@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import site.devmentor.domain.post.Post;
 import site.devmentor.domain.post.PostRepository;
+import site.devmentor.exception.post.PostNotFoundException;
 
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class PostAuthorizationInterceptor implements HandlerInterceptor {
 
   private Post findPost(Long postId) {
     return postRepository.findById(postId)
-            .orElseThrow(() -> new RuntimeException("not found post"));
+            .orElseThrow(() -> new PostNotFoundException(String.valueOf(postId)));
   }
 
   private Long getPathVariablePostId(HttpServletRequest request) {
