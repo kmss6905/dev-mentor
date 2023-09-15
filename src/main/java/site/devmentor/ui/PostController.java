@@ -7,6 +7,7 @@ import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
 import site.devmentor.dto.ResponseUtil;
+import site.devmentor.dto.comment.CommentCreateDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.post.response.PostCreateResponse;
 
@@ -28,25 +29,35 @@ public class PostController {
           @RequestBody PostCreateUpdateRequest postCreateUpdateRequest) {
     PostCreateResponse postCreateResponse = postService.create(authUser, postCreateUpdateRequest);
     return ResponseEntity
-            .created(URI.create("/api/posts/" + postCreateResponse.postId()))
+            .created(URI.create("/api/posts/" + postCreateResponse.getPostId()))
             .body(postCreateResponse);
   }
 
   @AuthorAccessOnly
-  @PatchMapping("/{id}")
+  @PatchMapping("/{postId}")
   public ResponseEntity<?> update(
-          @PathVariable long id,
+          @PathVariable long postId,
           @RequestBody PostCreateUpdateRequest updateRequest) {
     return ResponseEntity.ok(postService
-            .update(id, updateRequest));
+            .update(postId, updateRequest));
   }
 
   @AuthorAccessOnly
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{postId}")
   public ResponseEntity<?> delete(
-          @PathVariable long id
+          @PathVariable long postId
   ) {
-    postService.delete(id);
+    postService.delete(postId);
     return ResponseUtil.ok();
+  }
+
+  @PostMapping("/{postId}/comments")
+  public ResponseEntity<?> replyComment(
+          @LoginUser AuthenticatedUser authUser,
+          @RequestBody CommentCreateDto commentCreateDto,
+          @PathVariable long postId
+  ) {
+    return ResponseEntity.created(URI.create("/api/posts/" + postId + "/comments"))
+            .body(postService.replyComment(authUser, commentCreateDto, postId));
   }
 }
