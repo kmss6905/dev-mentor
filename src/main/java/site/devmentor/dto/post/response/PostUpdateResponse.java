@@ -2,17 +2,19 @@ package site.devmentor.dto.post.response;
 
 
 import lombok.Builder;
+import lombok.Getter;
 import site.devmentor.domain.post.Post;
 import site.devmentor.util.DateUtils;
 
+@Getter
 public class PostUpdateResponse {
 
-  private long postId;
-  private String createdAt;
-  private String updatedAt;
+  private final long postId;
+  private final String createdAt;
+  private final String updatedAt;
 
   @Builder
-  private PostUpdateResponse(final long postId, final String createdAt, String updatedAt) {
+  private PostUpdateResponse(final long postId, final String createdAt, final String updatedAt) {
     this.postId = postId;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;

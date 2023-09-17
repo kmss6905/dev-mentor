@@ -1,7 +1,6 @@
 package site.devmentor.dto.comment;
 
 import lombok.Builder;
-import lombok.Getter;
 import site.devmentor.domain.comment.Comment;
 import site.devmentor.util.DateUtils;
 

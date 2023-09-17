@@ -5,13 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.dto.comment.CommentCreateDto;
-import site.devmentor.dto.comment.CommentCreateResponse;
-import site.devmentor.util.DateUtils;
 
 @Table(name = "COMMENT")
 @Entity

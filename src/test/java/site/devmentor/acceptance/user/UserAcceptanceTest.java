@@ -1,25 +1,19 @@
 package site.devmentor.acceptance.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import site.devmentor.acceptance.AcceptanceTest;
-import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.user.request.UserCreateRequest;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static site.devmentor.acceptance.utils.Fixture.*;
 
 @DisplayName("유저 인수 테스트")
 public class UserAcceptanceTest extends AcceptanceTest {
@@ -27,24 +21,15 @@ public class UserAcceptanceTest extends AcceptanceTest {
   @Autowired
   private UserRepository userRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-
-  @BeforeEach
-  void deleteUser() {
-    userRepository.deleteAll();
-  }
-
   @Test
   void 회원가입_성공() throws Exception {
     // given
-    UserCreateRequest userCreateRequest = new UserCreateRequest("user3", "user333333", "user3@dev.io");
-    String userSignUpRequestAsString = new ObjectMapper().writeValueAsString(userCreateRequest);
+    String body = objectMapper.writeValueAsString(USER_ONE);
 
     // when, then
     mockMvc.perform(post("/api/user")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(userSignUpRequestAsString))
+                    .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").isBoolean())
             .andExpect(jsonPath("$.success").value(true))
@@ -54,46 +39,42 @@ public class UserAcceptanceTest extends AcceptanceTest {
   @Test
   void 중복아이디_회원가입_실패() throws Exception {
     // given
-    String givenUserId = "user1";
-    saveOneUser(givenUserId, "user1@dev.io");
-    UserCreateRequest userCreateRequest = new UserCreateRequest(givenUserId, "user333333", "user2@dev.io");
-    String userSignUpRequestAsString = new ObjectMapper().writeValueAsString(userCreateRequest);
+    userRepository.save(USER_ONE);
+    String body = objectMapper.writeValueAsString(MAKE_DUPLICATED_ID_USER_REQUEST);
 
     // when, then
     this.mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(userSignUpRequestAsString))
+            .content(body))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.success").isBoolean())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").isString())
-            .andExpect(jsonPath("$.message").value(String.format("아이디 '%s'는 이미 사용 중입니다.", givenUserId)))
+            .andExpect(jsonPath("$.message").value(String.format("아이디 '%s'는 이미 사용 중입니다.", USER_ONE.getUserId())))
     ;
   }
 
   @Test
   void 중복이메일_회원가입_실패() throws Exception{
     // given
-    String givenEmail = "user1@dev.io";
-    saveOneUser("user1", givenEmail);
-    UserCreateRequest userCreateRequest = new UserCreateRequest("user2", "user333333", "user1@dev.io");
-    String userSignUpRequestAsString = new ObjectMapper().writeValueAsString(userCreateRequest);
+    userRepository.save(USER_ONE);
+    String body = objectMapper.writeValueAsString(MAKE_DUPLICATED_EMAIL_USER_REQUEST);
 
     // when, then
     this.mockMvc.perform(post("/api/user")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(userSignUpRequestAsString))
+                    .content(body))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.success").isBoolean())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").isString())
-            .andExpect(jsonPath("$.message").value(String.format("이메일 '%s'는 이미 사용 중입니다.", givenEmail)));
+            .andExpect(jsonPath("$.message").value(String.format("이메일 '%s'는 이미 사용 중입니다.", MAKE_DUPLICATED_EMAIL_USER_REQUEST.getEmail())));
   }
 
   @Test
   void 이메일중복확인_성공() throws Exception {
     // given
-    String email = "user2@dev.io";
+    String email = NEW_USER_EMAIL;
 
     // when, then
     this.mockMvc.perform(get("/api/user/email/{email}/exists", email))
@@ -104,10 +85,8 @@ public class UserAcceptanceTest extends AcceptanceTest {
   @Test
   void 중복이메일_이메일중복확인_실패() throws Exception {
     // given, when
-    String givenEmail = "user2@dev.io";
-    userRepository.save(User.builder().userId("user1").email("user2@dev.io")
-            .password("user2password123123!")
-            .build());
+    userRepository.save(USER_ONE);
+    String givenEmail = USER_ONE.getEmail();
 
     // then
     this.mockMvc.perform(get("/api/user/email/{email}/exists", givenEmail))
@@ -120,50 +99,43 @@ public class UserAcceptanceTest extends AcceptanceTest {
 
   @Test
   void 아이디중복확인_성공() throws Exception {
-    // given, when
-    String id = "user2";
-    this.mockMvc.perform(get("/api/user/{id}/exists", id))
+    // given, when, then
+    String userId = NEW_USER_ID;
+    this.mockMvc.perform(get("/api/user/{id}/exists", userId))
             .andExpect(status().isOk());
   }
 
   @Test
   void 중복아이디_아이디중복확인_실패() throws Exception {
     // given, when
-    String givenUserId = "user1";
-    userRepository.save(User.builder().userId(givenUserId).email("user2@dev.io")
-            .password("user2password123123!")
-            .build());
+    userRepository.save(USER_ONE);
 
     // then
-    this.mockMvc.perform(get("/api/user/{id}/exists", givenUserId))
+    this.mockMvc.perform(get("/api/user/{id}/exists", USER_ONE.getUserId()))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.success").isBoolean())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").isString())
-            .andExpect(jsonPath("$.message").value(String.format("아이디 '%s'는 이미 사용 중입니다.", givenUserId)));
+            .andExpect(jsonPath("$.message").value(String.format("아이디 '%s'는 이미 사용 중입니다.", USER_ONE.getUserId())));
   }
 
   @Test
   void 회원가입_후_로그인_성공() throws Exception {
     // given
-    String userId = "user3";
-    String password = "user333333";
-    UserCreateRequest userCreateRequest = new UserCreateRequest(userId, password, "user3@dev.io");
-    String userSignUpRequestAsString = new ObjectMapper().writeValueAsString(userCreateRequest);
+    String body = objectMapper.writeValueAsString(USER_ONE);
 
-    // when
-    this.mockMvc.perform(post("/api/user")
+    // when, then
+    mockMvc.perform(post("/api/user")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(userSignUpRequestAsString))
+                    .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").isBoolean())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.message").doesNotExist());
 
-    LoginDto loginDto = new LoginDto(userId, password);
-    String loginDtoReq = new ObjectMapper().writeValueAsString(loginDto);
 
-    // then
+    // when, then
+    String loginDtoReq = objectMapper.writeValueAsString(MAKE_USER_ONE_LOGIN_REQUEST);
     this.mockMvc.perform(post("/api/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(loginDtoReq))
@@ -173,11 +145,10 @@ public class UserAcceptanceTest extends AcceptanceTest {
   @Test
   void 잘못된_비밀번호로_로그인_실패() throws Exception{
     // given
-    saveUser("user123123", "user123123@naver.com", "user123123");
+    userRepository.save(USER_ONE);
 
     // when
-    LoginDto loginDto = new LoginDto("user123123", "user123");
-    String loginDtoReq = new ObjectMapper().writeValueAsString(loginDto);
+    String loginDtoReq = objectMapper.writeValueAsString(MAKE_USER_ONE_WRONG_PASSWORD_REQUEST);
 
     // then
     this.mockMvc.perform(post("/api/login")
@@ -185,85 +156,40 @@ public class UserAcceptanceTest extends AcceptanceTest {
                     .content(loginDtoReq))
             .andExpect(status().isUnauthorized());
   }
-
+//
   @Test
+  @WithMockUser("1")
   void 프로필_생성_성공() throws Exception {
-    User user = saveUserAndGet("kmss69052", "kmss69052@naver.com", "kmss69052");
-    Matcher<String> datetimeMacher = Matchers.matchesRegex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+    // given
+    userRepository.save(USER_ONE);
+
+    // when, then
+    String body = objectMapper.writeValueAsString(MAKE_USER_PROFILE_REQUEST);
     this.mockMvc.perform(patch("/api/user/profile")
-                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
-                    .content("""
-                            {
-                              "content": "안녕하세요"
-                            }
-                            """)
+                    .content(body)
                     .contentType(MediaType.APPLICATION_JSON)
             )
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(user.getId()))
-            .andExpect(jsonPath("$.userId").value(user.getUserId()))
-            .andExpect(jsonPath("$.content").value("안녕하세요"))
-            .andExpect(jsonPath("$.createdAt", datetimeMacher))
-            .andExpect(jsonPath("$.updatedAt", datetimeMacher));
+            .andExpect(jsonPath("$.id").value(USER_ONE.getId()))
+            .andExpect(jsonPath("$.userId").value(USER_ONE.getUserId()))
+            .andExpect(jsonPath("$.content").value(MAKE_USER_PROFILE_REQUEST.content()))
+            .andExpect(jsonPath("$.createdAt", datetimeMatcher))
+            .andExpect(jsonPath("$.updatedAt", datetimeMatcher));
   }
 
   @Test
+  @WithMockUser(username = "1")
   void 프로필_삭제_성공() throws Exception {
     // given
-    User user = saveUserAndGet("kmss69052", "kmss69052@naver.com", "kmss69052");
-    Matcher<String> datetimeMacher = Matchers.matchesRegex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
-    this.mockMvc.perform(patch("/api/user/profile")
-                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
-                    .content("""
-                            {
-                              "content": "안녕하세요"
-                            }
-                            """)
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(user.getId()))
-            .andExpect(jsonPath("$.userId").value(user.getUserId()))
-            .andExpect(jsonPath("$.content").value("안녕하세요"))
-            .andExpect(jsonPath("$.createdAt", datetimeMacher))
-            .andExpect(jsonPath("$.updatedAt", datetimeMacher));
-
+    User user = userRepository.save(USER_ONE);
+    user.updateProfile(MAKE_USER_PROFILE_REQUEST);
 
     // when, then
     this.mockMvc.perform(delete("/api/user/profile")
-                    .with(user(String.valueOf(user.getId())).password("kmss69052"))
                     .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success").value(true));
-  }
-
-  private void saveOneUser(String userId, String email) {
-    userRepository.save(
-            User.builder()
-                    .userId(userId)
-                    .email(email)
-                    .password(passwordEncoder.encode("user1password1234"))
-                    .build());
-  }
-
-  private void saveUser(String userId, String email, String password) {
-    userRepository.save(
-            User.builder()
-                    .userId(userId)
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .build());
-  }
-
-  private User saveUserAndGet(String userId, String email, String password) {
-    return userRepository.save(
-            User.builder()
-                    .userId(userId)
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .build());
   }
 }

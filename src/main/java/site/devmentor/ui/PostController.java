@@ -35,30 +35,30 @@ public class PostController {
   }
 
   @AuthorAccessOnly
-  @PatchMapping("/{postId}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> update(
-          @PathVariable long postId,
+          @PathVariable long id,
           @RequestBody PostCreateUpdateRequest updateRequest) {
     return ResponseEntity.ok(postService
-            .update(postId, updateRequest));
+            .update(id, updateRequest));
   }
 
   @AuthorAccessOnly
-  @DeleteMapping("/{postId}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> delete(
-          @PathVariable long postId
+          @PathVariable long id
   ) {
-    postService.delete(postId);
+    postService.delete(id);
     return ResponseUtil.ok();
   }
 
-  @PostMapping("/{postId}/comments")
+  @PostMapping("/{id}/comments")
   public ResponseEntity<CommentCreateResponse> replyComment(
           @LoginUser AuthenticatedUser authUser,
           @RequestBody CommentCreateDto commentCreateDto,
-          @PathVariable long postId
+          @PathVariable long id
   ) {
-    CommentCreateResponse commentCreateResponse = postService.replyComment(authUser, commentCreateDto, postId);
+    CommentCreateResponse commentCreateResponse = postService.replyComment(authUser, commentCreateDto, id);
     return ResponseEntity.ok(commentCreateResponse);
   }
 }
