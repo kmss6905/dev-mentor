@@ -8,9 +8,11 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.exception.UnauthorizedAccessException;
+import site.devmentor.exception.post.PostNotFoundException;
 
 import java.util.Objects;
 
@@ -18,7 +20,6 @@ import java.util.Objects;
 @Table(name = "POST")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE POST SET is_deleted = true WHERE id=?")
-@Where(clause = "is_deleted=false")
 public class Post extends BaseEntity {
 
   @Column(nullable = false)
@@ -44,7 +45,16 @@ public class Post extends BaseEntity {
     this.content = content;
   }
 
+  public static Post create(AuthenticatedUser authUser, PostCreateUpdateRequest postCreateUpdateRequest) {
+    return Post.builder()
+            .userPid(authUser.userPid())
+            .title(postCreateUpdateRequest.title())
+            .content(postCreateUpdateRequest.content())
+            .build();
+  }
+
   public void update(PostCreateUpdateRequest updateRequest) {
+    verifyNotDeleted();
     verifyTitle(updateRequest.title());
     verifyContent(updateRequest.content());
     if (isTitleNotEqual(updateRequest.title())) {
@@ -52,6 +62,12 @@ public class Post extends BaseEntity {
     }
     if (isContentNotEqual(updateRequest.content())) {
       this.content = updateRequest.content();
+    }
+  }
+
+  public void verifyNotDeleted() {
+    if (this.isDeleted) {
+      throw new PostNotFoundException(String.valueOf(this.id));
     }
   }
 
