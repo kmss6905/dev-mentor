@@ -6,6 +6,9 @@ import site.devmentor.application.post.PostService;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
+import site.devmentor.dto.ResponseUtil;
+import site.devmentor.dto.comment.CommentCreateDto;
+import site.devmentor.dto.comment.CommentCreateResponse;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.post.response.PostCreateResponse;
 
@@ -27,7 +30,7 @@ public class PostController {
           @RequestBody PostCreateUpdateRequest postCreateUpdateRequest) {
     PostCreateResponse postCreateResponse = postService.create(authUser, postCreateUpdateRequest);
     return ResponseEntity
-            .created(URI.create("/api/posts/" + postCreateResponse.postId()))
+            .created(URI.create("/api/posts/" + postCreateResponse.getPostId()))
             .body(postCreateResponse);
   }
 
@@ -38,5 +41,24 @@ public class PostController {
           @RequestBody PostCreateUpdateRequest updateRequest) {
     return ResponseEntity.ok(postService
             .update(id, updateRequest));
+  }
+
+  @AuthorAccessOnly
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> delete(
+          @PathVariable long id
+  ) {
+    postService.delete(id);
+    return ResponseUtil.ok();
+  }
+
+  @PostMapping("/{id}/comments")
+  public ResponseEntity<CommentCreateResponse> replyComment(
+          @LoginUser AuthenticatedUser authUser,
+          @RequestBody CommentCreateDto commentCreateDto,
+          @PathVariable long id
+  ) {
+    CommentCreateResponse commentCreateResponse = postService.replyComment(authUser, commentCreateDto, id);
+    return ResponseEntity.ok(commentCreateResponse);
   }
 }

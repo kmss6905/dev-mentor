@@ -7,7 +7,7 @@ public class UserFactory {
     return User.builder()
             .userId(userId)
             .email(userId + "@gmail.io")
-            .password("samplePassword")
+            .password("user1Password")
             .build();
   }
 }
