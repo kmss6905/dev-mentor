@@ -8,7 +8,12 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.BaseEntity;
-import site.devmentor.dto.comment.CommentCreateDto;
+import site.devmentor.domain.post.Post;
+import site.devmentor.dto.comment.CommentDto;
+import site.devmentor.exception.UnauthorizedAccessException;
+import site.devmentor.exception.comment.CommentNotFoundException;
+
+import java.util.Objects;
 
 @Table(name = "COMMENT")
 @Entity
@@ -35,15 +40,35 @@ public class Comment extends BaseEntity {
       throw new IllegalArgumentException("comment's content can not be empty");
     }
   }
-  public static Comment create(AuthenticatedUser authUser, long postId, CommentCreateDto commentCreateDto) {
+  public static Comment create(AuthenticatedUser authUser, long postId, CommentDto commentDto) {
     return Comment.builder()
             .postId(postId)
             .authorId(authUser.userPid())
-            .content(commentCreateDto.comment())
+            .content(commentDto.comment())
             .build();
+  }
+
+  private void checkOwner(AuthenticatedUser authUser) {
+    if (authUser == null || authUser.userPid() != this.authorId) {
+      throw new UnauthorizedAccessException();
+    }
   }
 
   public String getContent() {
     return content;
+  }
+
+  public void edit(AuthenticatedUser authUser, CommentDto commentDto, Post post) {
+    validatePostIdMatch(post.getId());
+    checkOwner(authUser);
+    if (!Objects.equals(content, commentDto.comment())) {
+      this.content = commentDto.comment();
+    }
+  }
+
+  private void validatePostIdMatch(long postId) {
+    if (this.postId != postId) {
+      throw new CommentNotFoundException(String.valueOf(id));
+    }
   }
 }
