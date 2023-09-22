@@ -7,6 +7,7 @@ import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.mentor.MentorRequestDto;
+import site.devmentor.dto.mentor.MentorRequestStatusDto;
 
 @RestController
 @RequestMapping("/api/mentor/requests")
@@ -33,6 +34,16 @@ public class MentorRequestController {
           @PathVariable long id
   ) {
     mentorRequestService.delete(authUser, id);
+    return ResponseUtil.ok();
+  }
+
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<?> updateStatus(
+          @LoginUser AuthenticatedUser authUser,
+          @RequestBody MentorRequestStatusDto requestStatus,
+          @PathVariable long id
+  ) {
+    mentorRequestService.update(authUser, requestStatus, id);
     return ResponseUtil.ok();
   }
 }
