@@ -37,10 +37,13 @@ public class MentorInfo extends BaseEntity {
   }
 
   public void increaseMentee() {
-    if (currentMentees >= maxMentees) {
-      throw new OverflowMentorRequestException();
-    }
+    verifyNotOverAvailableMentees();
     this.currentMentees = this.currentMentees + 1;
-    log.info("this.currentMentees : {}", this.currentMentees);
+  }
+
+  private void verifyNotOverAvailableMentees() {
+    if (currentMentees >= maxMentees) {
+      throw new OverflowMentorRequestException("멘토 요청이 마감되었습니다.");
+    }
   }
 }

@@ -3,9 +3,13 @@ package site.devmentor.acceptance.utils;
 import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.comment.Comment;
 import site.devmentor.domain.mentor.info.MentorInfo;
+import site.devmentor.domain.mentor.request.Memo;
+import site.devmentor.domain.mentor.request.MentorRequest;
+import site.devmentor.domain.mentor.request.Status;
 import site.devmentor.domain.post.Post;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
+import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.dto.user.request.UserProfileRequest;
@@ -45,6 +49,26 @@ public class Fixture {
           .maxMentees(100)
           .build();
 
+  public static MentorInfo FULL_MENTOR_INFO = MentorInfo.builder()
+          .userId(1L)
+          .currentMentees(100)
+          .maxMentees(100)
+          .build();
+
+  public static MentorRequest MENTOR_REQUEST = MentorRequest.builder()
+          .fromUserId(2L)
+          .toUserId(1L)
+          .status(Status.WAITING)
+          .memo(new Memo("memo"))
+          .build();
+
+  public static MentorRequest MENTOR_REQUEST_ACCEPTED = MentorRequest.builder()
+          .fromUserId(2L)
+          .toUserId(1L)
+          .memo(new Memo("memo"))
+          .status(Status.ACCEPTED)
+          .build();
+
   public static PostCreateUpdateRequest MAKE_POST_REQUEST = new PostCreateUpdateRequest("title", "content");
 
   public static UserCreateRequest MAKE_DUPLICATED_ID_USER_REQUEST =
@@ -58,4 +82,6 @@ public class Fixture {
   public static UserProfileRequest MAKE_USER_PROFILE_REQUEST = new UserProfileRequest("this is user content");
 
   public static CommentDto MAKE_COMMENT_REQUEST = new CommentDto("comment");
+
+  public static MentorRequestDto MENTOR_CREATE_REQUEST = new MentorRequestDto(1L, "memo");
 }

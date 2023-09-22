@@ -1,13 +1,11 @@
 package site.devmentor.ui;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.mentor.MentorRequestService;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
+import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.mentor.MentorRequestDto;
 
 @RestController
@@ -21,11 +19,20 @@ public class MentorRequestController {
   }
 
   @PostMapping
-  public ResponseEntity<?> mentorReq(
+  public ResponseEntity<?> createMentorRequest(
           @LoginUser AuthenticatedUser authUser,
           @RequestBody MentorRequestDto mentorRequestDto
   ) {
     mentorRequestService.request(authUser, mentorRequestDto);
-    return ResponseEntity.ok().body("ok");
+    return ResponseUtil.ok();
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteMentorRequest(
+          @LoginUser AuthenticatedUser authUser,
+          @PathVariable long id
+  ) {
+    mentorRequestService.delete(authUser, id);
+    return ResponseUtil.ok();
   }
 }
