@@ -2,6 +2,7 @@ package site.devmentor.acceptance.utils;
 
 import site.devmentor.auth.LoginDto;
 import site.devmentor.domain.comment.Comment;
+import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.post.Post;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
@@ -36,6 +37,12 @@ public class Fixture {
           .postId(1L)
           .authorId(1L)
           .content("comment")
+          .build();
+
+  public static MentorInfo MENTOR_INFO = MentorInfo.builder()
+          .userId(1L)
+          .currentMentees(0)
+          .maxMentees(100)
           .build();
 
   public static PostCreateUpdateRequest MAKE_POST_REQUEST = new PostCreateUpdateRequest("title", "content");
