@@ -32,6 +32,12 @@ public class DatabaseCleaner implements InitializingBean {
       if (it.equals("USER")) {
         return "USERS";
       }
+      if (it.equals("MENTORINFO")) {
+        return "MENTOR_INFO";
+      }
+      if (it.equals("MENTORREQUEST")) {
+        return "REQUEST";
+      }
       return it;
     }).collect(Collectors.toList());
 
