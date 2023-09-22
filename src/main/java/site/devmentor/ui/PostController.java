@@ -7,8 +7,9 @@ import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
 import site.devmentor.dto.ResponseUtil;
-import site.devmentor.dto.comment.CommentCreateDto;
+import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.comment.CommentCreateResponse;
+import site.devmentor.dto.comment.CommentUpdateResponse;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.post.response.PostCreateResponse;
 
@@ -39,8 +40,7 @@ public class PostController {
   public ResponseEntity<?> update(
           @PathVariable long id,
           @RequestBody PostCreateUpdateRequest updateRequest) {
-    return ResponseEntity.ok(postService
-            .update(id, updateRequest));
+    return ResponseEntity.ok(postService.update(id, updateRequest));
   }
 
   @AuthorAccessOnly
@@ -55,10 +55,21 @@ public class PostController {
   @PostMapping("/{id}/comments")
   public ResponseEntity<CommentCreateResponse> replyComment(
           @LoginUser AuthenticatedUser authUser,
-          @RequestBody CommentCreateDto commentCreateDto,
+          @RequestBody CommentDto commentDto,
           @PathVariable long id
   ) {
-    CommentCreateResponse commentCreateResponse = postService.replyComment(authUser, commentCreateDto, id);
-    return ResponseEntity.ok(commentCreateResponse);
+    return ResponseEntity.ok(postService.replyComment(authUser, commentDto, id));
+  }
+
+  // rest api design 에 따른다면 자원의 위치를 알려주는 것이 맞다. 그렇기 때문에 api/posts/:id/comments/:id 가 맞지만..
+  // 실제 postId 를 받아서 어떤 검증을 한다?.. 매번 댓글 삭제할 때마다 post 의 삭제여부를 검사 후 삭제한다.?
+  @PatchMapping("/{postId}/comments/{commentId}")
+  public ResponseEntity<CommentUpdateResponse> updateComment(
+          @LoginUser AuthenticatedUser authUser,
+          @RequestBody CommentDto commentDto,
+          @PathVariable(name = "postId") long postId,
+          @PathVariable(name = "commentId") long commentId
+  ) {
+    return ResponseEntity.ok(postService.editComment(authUser, commentDto, postId, commentId));
   }
 }
