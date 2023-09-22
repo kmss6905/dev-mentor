@@ -1,7 +1,6 @@
 package site.devmentor.application.mentor;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.mentor.info.MentorInfo;
@@ -41,5 +40,17 @@ public class MentorRequestService {
 
   private MentorInfo findMentorInfo(MentorRequestDto mentorRequestDto) {
     return mentorInfoRepository.findMentorInfoByUserId(mentorRequestDto.mentorUserId());
+  }
+
+  @Transactional
+  public void delete(AuthenticatedUser authUser, long id) {
+    MentorRequest mentorRequest = findMentorRequest(id);
+    mentorRequest.verifyCanDelete(authUser);
+    mentorRequestRepository.deleteById(id);
+  }
+
+  private MentorRequest findMentorRequest(long id) {
+    return mentorRequestRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("can't find mentor request, id=" + id));
   }
 }

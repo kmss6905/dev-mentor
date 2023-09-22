@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import site.devmentor.exception.common.ErrorResponse;
+import site.devmentor.exception.mentor.MentorException;
+import site.devmentor.exception.mentor.OverflowMentorRequestException;
 import site.devmentor.exception.post.PostNotFoundException;
 
 
@@ -43,4 +45,15 @@ public class GlobalExceptionHandler {
             .body(ErrorResponse.of(ex.getMessage()));
   }
 
+  @ExceptionHandler(MentorException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(MentorException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(ErrorResponse.of(ex.getMessage()));
+  }
+
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(IllegalStateException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(ErrorResponse.of(ex.getMessage()));
+  }
 }
