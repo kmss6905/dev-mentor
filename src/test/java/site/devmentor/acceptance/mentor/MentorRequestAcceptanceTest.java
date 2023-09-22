@@ -13,8 +13,7 @@ import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
 import site.devmentor.domain.user.UserRepository;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static site.devmentor.acceptance.utils.Fixture.*;
@@ -119,5 +118,35 @@ public class MentorRequestAcceptanceTest extends AcceptanceTest {
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.success").value(false));
+  }
+
+  @Test
+  @WithMockUser(username = "1")
+  void 멘토요청_승락() throws Exception {
+    // given
+    mentorInfoRepository.save(MENTOR_INFO);
+    MentorRequest mentorRequest = mentorRequestRepository.save(MENTOR_REQUEST);
+    String body = objectMapper.writeValueAsString(MAKE_UPDATE_MENTOR_REQUEST_TO_ACCEPTED);
+
+    // when, then
+    this.mockMvc.perform(patch("/api/mentor/requests/{id}/status", mentorRequest.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body))
+            .andExpect(status().isOk());
+  }
+
+  @Test
+  @WithMockUser(username = "1")
+  void 거부상태_멘토요청_상태변경_실패() throws Exception {
+    // given
+    mentorInfoRepository.save(MENTOR_INFO);
+    MentorRequest mentorRequest = mentorRequestRepository.save(MENTOR_REQUEST_DENIED);
+    String body = objectMapper.writeValueAsString(MAKE_UPDATE_MENTOR_REQUEST_TO_ACCEPTED);
+
+    // when, then
+    this.mockMvc.perform(patch("/api/mentor/requests/{id}/status", mentorRequest.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body))
+            .andExpect(status().isForbidden());
   }
 }

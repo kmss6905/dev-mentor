@@ -10,6 +10,7 @@ import site.devmentor.domain.post.Post;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.mentor.MentorRequestDto;
+import site.devmentor.dto.mentor.MentorRequestStatusDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.dto.user.request.UserProfileRequest;
@@ -69,6 +70,12 @@ public class Fixture {
           .status(Status.ACCEPTED)
           .build();
 
+  public static MentorRequest MENTOR_REQUEST_DENIED = MentorRequest.builder()
+          .fromUserId(2L)
+          .toUserId(1L)
+          .memo(new Memo("memo"))
+          .status(Status.DENIED)
+          .build();
   public static PostCreateUpdateRequest MAKE_POST_REQUEST = new PostCreateUpdateRequest("title", "content");
 
   public static UserCreateRequest MAKE_DUPLICATED_ID_USER_REQUEST =
@@ -84,4 +91,6 @@ public class Fixture {
   public static CommentDto MAKE_COMMENT_REQUEST = new CommentDto("comment");
 
   public static MentorRequestDto MENTOR_CREATE_REQUEST = new MentorRequestDto(1L, "memo");
+
+  public static MentorRequestStatusDto MAKE_UPDATE_MENTOR_REQUEST_TO_ACCEPTED = new MentorRequestStatusDto(Status.ACCEPTED);
 }
