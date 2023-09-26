@@ -12,6 +12,8 @@ import site.devmentor.exception.mentor.MentorException;
 import site.devmentor.exception.mentor.OverflowMentorRequestException;
 import site.devmentor.exception.post.PostNotFoundException;
 
+import java.text.ParseException;
+
 
 @Slf4j
 @RestControllerAdvice
@@ -55,5 +57,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleNotFoundException(IllegalStateException ex) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(ErrorResponse.of(ex.getMessage()));
+  }
+
+  @ExceptionHandler(ParseException.class)
+  public ResponseEntity<String> handleParseException(ParseException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body("날짜 및 시간 형식이 올바르지 않습니다. yyyy-MM-dd hh:mm");
   }
 }

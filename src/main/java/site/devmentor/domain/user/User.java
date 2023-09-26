@@ -2,10 +2,7 @@ package site.devmentor.domain.user;
 
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.user.vo.UserProfile;
 import site.devmentor.dto.user.request.UserProfileRequest;
@@ -32,6 +29,9 @@ public class User extends BaseEntity {
   @Enumerated
   private UserProfile profile;
 
+  @Column(name = "is_deleted")
+  private boolean isDeleted;
+
   @Builder
   private User(final String userId, final String password, final String email){
     this.userId = userId;
@@ -56,5 +56,10 @@ public class User extends BaseEntity {
     if (isProfileNotEmpty()) {
       this.profile = null;
     }
+  }
+
+  public boolean same(final User user) {
+    assert user != null;
+    return this.id == user.getId();
   }
 }
