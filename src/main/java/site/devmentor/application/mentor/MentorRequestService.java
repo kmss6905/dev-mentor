@@ -15,13 +15,11 @@ import site.devmentor.exception.ResourceNotFoundException;
 @Service
 public class MentorRequestService {
 
-  private final UserRepository userRepository;
   private final MentorRequestRepository mentorRequestRepository;
 
   private final MentorInfoRepository mentorInfoRepository;
 
-  public MentorRequestService(UserRepository userRepository, MentorRequestRepository mentorRequestRepository, MentorInfoRepository mentorInfoRepository) {
-    this.userRepository = userRepository;
+  public MentorRequestService(MentorRequestRepository mentorRequestRepository, MentorInfoRepository mentorInfoRepository) {
     this.mentorRequestRepository = mentorRequestRepository;
     this.mentorInfoRepository = mentorInfoRepository;
   }

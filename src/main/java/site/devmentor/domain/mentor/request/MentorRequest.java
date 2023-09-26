@@ -49,6 +49,7 @@ public class MentorRequest extends BaseEntity {
             .fromUserId(authUser.userPid())
             .toUserId(mentorRequestDto.mentorUserId())
             .memo(new Memo(mentorRequestDto.memo()))
+            .status(Status.WAITING)
             .build();
   }
 
@@ -92,5 +93,13 @@ public class MentorRequest extends BaseEntity {
     if (this.status == Status.DENIED) {
       throw new IllegalStateException("can change, because now status is = " + status.name());
     }
+  }
+
+  public long getFromUserId() {
+    return fromUserId;
+  }
+
+  public Status getStatus() {
+    return status;
   }
 }
