@@ -9,7 +9,8 @@ import site.devmentor.domain.mentor.schedule.ScheduleRepository;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
-import site.devmentor.dto.schedule.SchduleResponse;
+import site.devmentor.dto.mentor.schedule.MentorScheduleResponse;
+import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 
 @Service
 public class ScheduleService {
@@ -23,12 +24,30 @@ public class ScheduleService {
     this.userRepository = userRepository;
   }
 
-  public SchduleResponse create(AuthenticatedUser authUser, MentorScheduleDto mentorScheduleDto) {
-    MentorRequest mentorRequest = mentorRequestRepository.findById(mentorScheduleDto.getRequestId()).orElseThrow(IllegalStateException::new);
-    User mentee = userRepository.findById(mentorRequest.getFromUserId()).orElseThrow(IllegalStateException::new);
-    User mentor = userRepository.findById(authUser.userPid()).orElseThrow(IllegalStateException::new);
+  public MentorScheduleResponse create(AuthenticatedUser authUser, MentorScheduleDto mentorScheduleDto) {
+    MentorRequest mentorRequest = findMentorRequest(mentorScheduleDto.getRequestId());
+    User mentee = findUser(mentorRequest.getFromUserId());
+    User mentor = findUser(authUser.userPid());
     Schedule schedule = Schedule.create(mentor, mentee, mentorRequest, mentorScheduleDto);
     Schedule save = scheduleRepository.save(schedule);
-    return new SchduleResponse(save.getId());
+    return new MentorScheduleResponse(save.getId());
+  }
+
+  private MentorRequest findMentorRequest(long requestId) {
+    return mentorRequestRepository.findById(requestId).orElseThrow(IllegalStateException::new);
+  }
+
+  private User findUser(long id) {
+    return userRepository.findById(id).orElseThrow(IllegalStateException::new);
+  }
+
+  public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto, long id) {
+    Schedule schedule = findSchedule(id);
+    schedule.update(authUser, mentorScheduleUpdateDto);
+  }
+
+  private Schedule findSchedule(long id) {
+    return scheduleRepository.findById(id)
+            .orElseThrow(IllegalStateException::new);
   }
 }
