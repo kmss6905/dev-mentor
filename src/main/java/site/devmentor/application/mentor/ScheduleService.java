@@ -1,6 +1,7 @@
 package site.devmentor.application.mentor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
@@ -49,5 +50,11 @@ public class ScheduleService {
   private Schedule findSchedule(long id) {
     return scheduleRepository.findById(id)
             .orElseThrow(IllegalStateException::new);
+  }
+
+  @Transactional
+  public void delete(AuthenticatedUser authUser, long id) {
+    Schedule schedule = findSchedule(id);
+    schedule.delete(authUser);
   }
 }
