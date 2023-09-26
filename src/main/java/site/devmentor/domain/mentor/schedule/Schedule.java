@@ -5,20 +5,26 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
 import site.devmentor.domain.mentor.schedule.vo.Content;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleTime;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
+import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
+import site.devmentor.exception.UnauthorizedAccessException;
 
 import java.time.LocalDateTime;
 
 @Table(name = "MENTORING_SCHEDULE")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 public class Schedule extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -32,13 +38,9 @@ public class Schedule extends BaseEntity {
   private User mentor;
   @Embedded
   private Content content;
-  @NotNull
-  @Column(name = "start_time", nullable = false)
-  private LocalDateTime startTime;
 
-  @NotNull
-  @Column(name = "end_time", nullable = false)
-  private LocalDateTime endTime;
+  @Embedded
+  private ScheduleTime time;
 
   @NotNull
   @Column(name = "is_deleted", nullable = false)
@@ -56,21 +58,21 @@ public class Schedule extends BaseEntity {
   private Schedule(final User mentor, final User mentee, final MentorRequest request, final LocalDateTime startTime, final LocalDateTime endTime, final String title, final String memo) {
     verifyRequestNotNull(request);
     verifyOnlyForAcceptedRequest(request);
-    verifyTime(startTime, endTime);
     verifyMentorAndMentee(mentor, mentee);
+    verifyOwner(request, mentor);
     this.mentor = mentor;
     this.mentee = mentee;
     this.request = request;
-    this.startTime = startTime;
-    this.endTime = endTime;
     this.content = new Content(title, memo);
+    this.time = new ScheduleTime(startTime, endTime);
   }
 
-  private void verifyTime(LocalDateTime startTime, LocalDateTime endTime) {
-    verifyTimeNotNull(startTime);
-    verifyTimeNotNull(endTime);
-    verifyStartTimeNotAfterEndTime(startTime, endTime);
+  private void verifyOwner(MentorRequest request, User mentor) {
+    if (request.getToUserId() != mentor.getId()) {
+      throw new UnauthorizedAccessException();
+    }
   }
+
 
   private void verifyOnlyForAcceptedRequest(MentorRequest request) {
     if(!request.getStatus().equals(Status.ACCEPTED)) {
@@ -94,18 +96,6 @@ public class Schedule extends BaseEntity {
     }
   }
 
-  private static void verifyTimeNotNull(LocalDateTime endTime) {
-    if (endTime == null) {
-      throw new IllegalArgumentException("schedule require endTime");
-    }
-  }
-
-  private void verifyStartTimeNotAfterEndTime(LocalDateTime startTime, LocalDateTime endTime) {
-    if (startTime != null && endTime != null && startTime.isAfter(endTime)) {
-      throw new IllegalArgumentException("startTime cannot be after endTime");
-    }
-  }
-
   public static Schedule create(
           final User mentor, final User mentee, final MentorRequest request, final MentorScheduleDto mentorScheduleDto
           ) {
@@ -117,5 +107,17 @@ public class Schedule extends BaseEntity {
             .title(mentorScheduleDto.getTitle())
             .memo(mentorScheduleDto.getMemo())
             .request(request).build();
+  }
+
+  public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto) {
+    checkOwner(authUser);
+    this.content.update(mentorScheduleUpdateDto.getTitle(), mentorScheduleUpdateDto.getMemo());
+    this.time.update(mentorScheduleUpdateDto.getStartDate(), mentorScheduleUpdateDto.getEndDate());
+  }
+
+  private void checkOwner(AuthenticatedUser authUser) {
+    if (this.mentor.getId() != authUser.userPid()) {
+      throw new UnauthorizedAccessException();
+    }
   }
 }

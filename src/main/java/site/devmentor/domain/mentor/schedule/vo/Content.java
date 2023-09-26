@@ -5,6 +5,8 @@ import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Content {
@@ -21,5 +23,15 @@ public class Content {
     }
     this.title = title;
     this.memo = memo;
+  }
+
+  public void update(String title, String memo) {
+    if (!Objects.equals(this.title, title)) {
+      this.title = title;
+    }
+
+    if (!Objects.equals(this.memo, memo)) {
+      this.memo = memo;
+    }
   }
 }

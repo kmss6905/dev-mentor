@@ -8,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Data
 @Getter
 @NoArgsConstructor
 public class MentorScheduleDto{

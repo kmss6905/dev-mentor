@@ -99,6 +99,10 @@ public class MentorRequest extends BaseEntity {
     return fromUserId;
   }
 
+  public long getToUserId() {
+    return toUserId;
+  }
+
   public Status getStatus() {
     return status;
   }
