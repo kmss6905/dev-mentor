@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.mentor.request.MentorRequest;
@@ -109,6 +110,7 @@ public class Schedule extends BaseEntity {
             .request(request).build();
   }
 
+  @Transactional
   public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto) {
     checkOwner(authUser);
     this.content.update(mentorScheduleUpdateDto.getTitle(), mentorScheduleUpdateDto.getMemo());
@@ -119,5 +121,12 @@ public class Schedule extends BaseEntity {
     if (this.mentor.getId() != authUser.userPid()) {
       throw new UnauthorizedAccessException();
     }
+  }
+
+  @Transactional
+  public void delete(AuthenticatedUser authUser) {
+    checkOwner(authUser);
+    this.deletedAt = LocalDateTime.now();
+    this.isDeleted = true;
   }
 }

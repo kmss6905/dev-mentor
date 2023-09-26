@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.mentor.ScheduleService;
 import site.devmentor.auth.AuthenticatedUser;
 import site.devmentor.auth.LoginUser;
-import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
-import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
 import site.devmentor.dto.mentor.schedule.MentorScheduleResponse;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
@@ -37,6 +35,14 @@ public class MentorScheduleController {
           @Valid @RequestBody MentorScheduleUpdateDto mentorScheduleUpdateDto,
           @PathVariable long id) {
     scheduleService.update(authUser, mentorScheduleUpdateDto, id);
+    return ResponseUtil.ok();
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> removeSchedule(
+          @LoginUser AuthenticatedUser authUser,
+          @PathVariable long id) {
+    scheduleService.delete(authUser, id);
     return ResponseUtil.ok();
   }
 }
