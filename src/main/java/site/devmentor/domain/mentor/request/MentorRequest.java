@@ -27,7 +27,7 @@ public class MentorRequest extends BaseEntity {
   @Enumerated(value = EnumType.STRING)
   private Status status = Status.WAITING;
 
-  @Enumerated
+  @Embedded
   private Memo memo;
 
   @Column(name = "is_deleted")

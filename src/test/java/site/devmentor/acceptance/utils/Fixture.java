@@ -11,9 +11,14 @@ import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
+import site.devmentor.dto.mentor.schedule.MentorScheduleDetailDto;
+import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
+import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.dto.user.request.UserProfileRequest;
+
+import java.time.LocalDateTime;
 
 public class Fixture {
 
@@ -93,4 +98,17 @@ public class Fixture {
   public static MentorRequestDto MENTOR_CREATE_REQUEST = new MentorRequestDto(1L, "memo");
 
   public static MentorRequestStatusDto MAKE_UPDATE_MENTOR_REQUEST_TO_ACCEPTED = new MentorRequestStatusDto(Status.ACCEPTED);
+
+  public static MentorScheduleDto MAKE_SCHEDULE_REQUEST = new MentorScheduleDto(
+          1L, "title", LocalDateTime.of(2023, 1, 1, 0, 0), LocalDateTime.of(2023,1,10,0,0), "memo"
+  );
+
+  public static MentorScheduleUpdateDto MAKE_SCHEDULE_UPDATE_REQUEST = new MentorScheduleUpdateDto(
+          "update_title", "update_memo", LocalDateTime.of(2023, 1, 10, 0, 0), LocalDateTime.of(2023, 1, 20, 0, 0)
+  );
+
+  public static MentorScheduleDetailDto MAKE_SCHEDULE_DETAIL_REQUEST = new MentorScheduleDetailDto(
+          "detail_title", LocalDateTime.of(2023, 1, 1, 1, 0), LocalDateTime.of(2023, 1, 1, 2, 0), "menteeMemo", "mentorMemo"
+  );
+
 }

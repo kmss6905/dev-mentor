@@ -7,7 +7,6 @@ import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.info.MentorInfoRepository;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
-import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
 import site.devmentor.exception.ResourceNotFoundException;
@@ -30,7 +29,6 @@ public class MentorRequestService {
     MentorRequest mentorRequest = MentorRequest.create(authUser, mentorRequestDto);
     saveMentorRequest(mentorRequest);
     mentorInfo.increaseMentee();
-    mentorInfoRepository.save(mentorInfo);
   }
 
   private void saveMentorRequest(MentorRequest mentorRequest) {
