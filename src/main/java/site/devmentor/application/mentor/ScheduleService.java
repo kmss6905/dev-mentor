@@ -26,7 +26,7 @@ public class ScheduleService {
   }
 
   public MentorScheduleResponse create(AuthenticatedUser authUser, MentorScheduleDto mentorScheduleDto) {
-    MentorRequest mentorRequest = findMentorRequest(mentorScheduleDto.getRequestId());
+    MentorRequest mentorRequest = findMentorRequest(mentorScheduleDto.requestId());
     User mentee = findUser(mentorRequest.getFromUserId());
     User mentor = findUser(authUser.userPid());
     Schedule schedule = Schedule.create(mentor, mentee, mentorRequest, mentorScheduleDto);
@@ -42,6 +42,7 @@ public class ScheduleService {
     return userRepository.findById(id).orElseThrow(IllegalStateException::new);
   }
 
+  @Transactional
   public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto, long id) {
     Schedule schedule = findSchedule(id);
     schedule.update(authUser, mentorScheduleUpdateDto);

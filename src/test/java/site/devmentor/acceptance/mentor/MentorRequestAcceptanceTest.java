@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import site.devmentor.acceptance.AcceptanceTest;
+import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.info.MentorInfoRepository;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
 import site.devmentor.domain.user.UserRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,14 +42,23 @@ public class MentorRequestAcceptanceTest extends AcceptanceTest {
   @WithMockUser(username = "2")
   void 멘토요청_성공() throws Exception {
     // given
-    mentorInfoRepository.save(MENTOR_INFO);
-
-    // when, then
+    mentorInfoRepository.saveAndFlush(MENTOR_INFO);
     String body = objectMapper.writeValueAsString(MENTOR_CREATE_REQUEST);
+
+
     this.mockMvc.perform(post("/api/mentor/requests")
                     .content(body)
                     .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andReturn();
+
+
+    Thread.sleep(1000);
+
+    // then
+    MentorInfo mentorInfo = mentorInfoRepository.findByUserId(1L);
+    assertEquals(1, mentorRequestRepository.findAll().size());
+    assertEquals(1, mentorInfo.getCurrentMentees());
   }
 
   @Test
