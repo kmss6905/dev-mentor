@@ -7,16 +7,14 @@ import site.devmentor.domain.mentor.request.Memo;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailMemo;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailTime;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleMenteeMemo;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleMentorMemo;
+import site.devmentor.domain.mentor.schedule.vo.*;
 import site.devmentor.domain.post.Post;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
 import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
+import site.devmentor.dto.mentor.schedule.ScheduleDetailStatusRequest;
 import site.devmentor.dto.mentor.schedule.ScheduleRequest;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
@@ -134,5 +132,7 @@ public class Fixture {
           "update_detail_title", LocalDateTime.of(2023, 1,
           1, 10, 0), LocalDateTime.of(2023, 1, 1, 11, 0), "updateMenteeMemo", "updateMentorMemo"
   );
+
+  public static ScheduleDetailStatusRequest MAKE_SCHEDULE_DETAIL_STATUS_DOING_UPDATE_REQUEST = new ScheduleDetailStatusRequest(ScheduleDetailStatus.DOING);
 
 }

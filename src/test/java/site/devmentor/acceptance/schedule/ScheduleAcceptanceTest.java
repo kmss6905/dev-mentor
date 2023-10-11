@@ -185,7 +185,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
     // then
     mockMvc.perform(delete("/api/mentor/schedules/{id}", 1L)
                     .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            .andExpect(status().isNoContent());
     Optional<Schedule> schedule1 = scheduleRepository.findById(1L);
     assertThat(schedule1.isEmpty()).isTrue();
   }

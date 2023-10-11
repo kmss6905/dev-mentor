@@ -15,10 +15,7 @@ import site.devmentor.domain.mentor.schedule.Schedule;
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
 import site.devmentor.domain.mentor.schedule.ScheduleDetailRepository;
 import site.devmentor.domain.mentor.schedule.ScheduleRepository;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailMemo;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailTime;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleMenteeMemo;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleMentorMemo;
+import site.devmentor.domain.mentor.schedule.vo.*;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
@@ -31,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static site.devmentor.acceptance.utils.Fixture.MAKE_SCHEDULE_DETAIL_STATUS_DOING_UPDATE_REQUEST;
 import static site.devmentor.acceptance.utils.Fixture.MAKE_SCHEDULE_DETAIL_UPDATE_REQUEST;
 
 @DisplayName("스케줄 상세정보 인수테스트")
@@ -167,6 +165,36 @@ public class ScheduleDetailRequestAcceptanceTest extends AcceptanceTest {
             .andExpect(status().isUnauthorized());
         Optional<ScheduleDetail> detail = scheduleDetailRepository.findById(1L);
         assertThat(detail.isPresent()).isTrue();
+    }
+
+    @Test
+    @WithMockUser("1")
+    void 스케줄세부정보_상태변경_성공() throws Exception {
+        // given
+        saveScheduleDetail();
+
+        // when, then
+        mockMvc.perform(patch("/api/mentor/schedules/details/{detailId}/status", 1L)
+                .content(toBody(MAKE_SCHEDULE_DETAIL_STATUS_DOING_UPDATE_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value(ScheduleDetailStatus.DOING))
+            .andExpect(jsonPath("$.updateAt").isNotEmpty());
+        ScheduleDetail scheduleDetail = scheduleDetailRepository.findById(1L).get();
+        assertThat(scheduleDetail.getStatus()).isEqualTo(ScheduleDetailStatus.DOING);
+    }
+
+    @Test
+    @WithMockUser("2")
+    void 권한없는_유저_스케줄세부정보_상태변경_실패() throws Exception {
+        // given
+        saveScheduleDetail();
+
+        // when, then
+        mockMvc.perform(patch("/api/mentor/schedules/details/{detailId}/status", 1L)
+                .content(toBody(MAKE_SCHEDULE_DETAIL_STATUS_DOING_UPDATE_REQUEST))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnauthorized());
     }
 
 
