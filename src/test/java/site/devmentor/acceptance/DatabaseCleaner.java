@@ -38,12 +38,14 @@ public class DatabaseCleaner implements InitializingBean {
       if (it.equals("MENTORREQUEST")) {
         return "REQUEST";
       }
+      if (it.equals("SCHEDULE")) {
+        return "MENTORING_SCHEDULE";
+      }
+      if (it.equals("SCHEDULEDETAIL")) {
+        return "MENTORING_SCHEDULE_DETAIL";
+      }
       return it;
     }).collect(Collectors.toList());
-
-    for (String tableName: tableNames) {
-      System.out.println(tableName);
-    }
   }
 
   @Transactional

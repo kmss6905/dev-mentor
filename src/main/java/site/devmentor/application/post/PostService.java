@@ -2,7 +2,7 @@ package site.devmentor.application.post;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.comment.Comment;
 import site.devmentor.domain.comment.CommentRepository;
 import site.devmentor.domain.post.Post;
@@ -28,7 +28,7 @@ public class PostService {
     this.commentRepository = commentRepository;
   }
 
-  public PostCreateResponse create(AuthenticatedUser authUser, PostCreateUpdateRequest postCreateUpdateRequest) {
+  public PostCreateResponse create(AppUser authUser, PostCreateUpdateRequest postCreateUpdateRequest) {
     Post post = Post.create(authUser, postCreateUpdateRequest);
     Post savedPost = savePost(post);
     return PostCreateResponse.from(savedPost);
@@ -40,7 +40,7 @@ public class PostService {
     return PostUpdateResponse.from(post);
   }
 
-  public CommentCreateResponse replyComment(AuthenticatedUser authUser, CommentDto commentDto, long postId) {
+  public CommentCreateResponse replyComment(AppUser authUser, CommentDto commentDto, long postId) {
     Post post = findPost(postId);
     post.verifyNotDeleted();
     Comment savedComment = savedComment(Comment.create(authUser, postId, commentDto));
@@ -64,7 +64,7 @@ public class PostService {
     postRepository.deleteById(id);
   }
 
-  public CommentUpdateResponse editComment(AuthenticatedUser authUser, CommentDto commentDto, long postId, long commentId) {
+  public CommentUpdateResponse editComment(AppUser authUser, CommentDto commentDto, long postId, long commentId) {
     Post post = findPost(postId);
     post.verifyNotDeleted();
     Comment comment = findComment(commentId);

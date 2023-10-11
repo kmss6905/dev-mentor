@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.user.UserService;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
@@ -66,7 +66,7 @@ public class UserController {
 
   @PatchMapping("/profile")
   public ResponseEntity<UserProfileResponse> updateProfile(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody UserProfileRequest profileRequest) {
     UserProfileResponse userProfileResponse =  userService.updateProfile(authUser, profileRequest);
     return ResponseEntity.ok(userProfileResponse);
@@ -74,7 +74,7 @@ public class UserController {
 
   @DeleteMapping("/profile")
   public ResponseEntity<Response> deleteProfile(
-          @LoginUser AuthenticatedUser authUser
+          @LoginUser AppUser authUser
   ) {
     userService.deleteProfile(authUser);
     return ResponseUtil.ok();

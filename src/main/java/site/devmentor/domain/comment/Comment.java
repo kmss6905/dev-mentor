@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.post.Post;
 import site.devmentor.dto.comment.CommentDto;
@@ -40,16 +40,16 @@ public class Comment extends BaseEntity {
       throw new IllegalArgumentException("comment's content can not be empty");
     }
   }
-  public static Comment create(AuthenticatedUser authUser, long postId, CommentDto commentDto) {
+  public static Comment create(AppUser authUser, long postId, CommentDto commentDto) {
     return Comment.builder()
             .postId(postId)
-            .authorId(authUser.userPid())
+            .authorId(authUser.pid())
             .content(commentDto.comment())
             .build();
   }
 
-  private void checkOwner(AuthenticatedUser authUser) {
-    if (authUser == null || authUser.userPid() != this.authorId) {
+  private void checkOwner(AppUser authUser) {
+    if (authUser == null || authUser.pid() != this.authorId) {
       throw new UnauthorizedAccessException();
     }
   }
@@ -58,7 +58,7 @@ public class Comment extends BaseEntity {
     return content;
   }
 
-  public void edit(AuthenticatedUser authUser, CommentDto commentDto, Post post) {
+  public void edit(AppUser authUser, CommentDto commentDto, Post post) {
     validatePostIdMatch(post.getId());
     checkOwner(authUser);
     if (!Objects.equals(content, commentDto.comment())) {
