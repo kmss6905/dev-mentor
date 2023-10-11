@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import site.devmentor.exception.schedule.ScheduleDetailContentValidateException;
 
+import java.util.Objects;
+
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleMenteeMemo {
@@ -27,5 +29,17 @@ public class ScheduleMenteeMemo {
     if (content == null || content.trim().isEmpty()) {
       throw new ScheduleDetailContentValidateException("mentee memo can't be empty");
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    ScheduleMenteeMemo other = (ScheduleMenteeMemo) obj;
+    return Objects.equals(this.content, other.content);
   }
 }

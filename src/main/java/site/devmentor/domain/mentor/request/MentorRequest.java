@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
@@ -20,9 +20,9 @@ import java.time.LocalDateTime;
 public class MentorRequest extends BaseEntity {
 
   @Column(name = "from_user_id")
-  private long fromUserId;
+  private long menteeUserId;
   @Column(name = "to_user_id")
-  private long toUserId;
+  private long mentorUserId;
 
   @Enumerated(value = EnumType.STRING)
   private Status status = Status.WAITING;
@@ -37,35 +37,35 @@ public class MentorRequest extends BaseEntity {
   private LocalDateTime deletedAt;
 
   @Builder
-  protected MentorRequest(final long fromUserId, final long toUserId, final Memo memo, final Status status) {
+  protected MentorRequest(final long menteeUserId, final long mentorUserId, final Memo memo, final Status status) {
     this.memo = memo;
-    this.toUserId = toUserId;
-    this.fromUserId = fromUserId;
+    this.mentorUserId = mentorUserId;
+    this.menteeUserId = menteeUserId;
     this.status = status;
   }
 
-  public static MentorRequest create(AuthenticatedUser authUser, MentorRequestDto mentorRequestDto) {
+  public static MentorRequest create(AppUser authUser, MentorRequestDto mentorRequestDto) {
     return MentorRequest.builder()
-            .fromUserId(authUser.userPid())
-            .toUserId(mentorRequestDto.mentorUserId())
+            .mentorUserId(authUser.pid())
+            .menteeUserId(mentorRequestDto.mentorUserId())
             .memo(new Memo(mentorRequestDto.memo()))
             .status(Status.WAITING)
             .build();
   }
 
-  public void verifyCanDelete(AuthenticatedUser authUser) {
+  public void verifyCanDelete(AppUser authUser) {
     verifyNotAccessOwner(authUser);
     verifyNotYetAccepted();
   }
 
-  private void verifyNotAccessOwner(AuthenticatedUser authUser) {
-    if (this.fromUserId != authUser.userPid()) {
+  private void verifyNotAccessOwner(AppUser authUser) {
+    if (this.menteeUserId != authUser.pid()) {
       throw new UnauthorizedAccessException();
     }
   }
 
-  private void verifyNotAccessOwnerMentor(AuthenticatedUser authUser) {
-    if (this.toUserId != authUser.userPid()) {
+  private void verifyNotAccessOwnerMentor(AppUser authUser) {
+    if (this.mentorUserId != authUser.pid()) {
       throw new UnauthorizedAccessException();
     }
   }
@@ -76,7 +76,7 @@ public class MentorRequest extends BaseEntity {
     }
   }
 
-  public void changeStatus(AuthenticatedUser authUser, MentorRequestStatusDto requestStatus) {
+  public void changeStatus(AppUser authUser, MentorRequestStatusDto requestStatus) {
     verifyNotAccessOwnerMentor(authUser);
     verifyNotYetDenied();
     verifyStatusChangeability(requestStatus.status());
@@ -95,12 +95,12 @@ public class MentorRequest extends BaseEntity {
     }
   }
 
-  public long getFromUserId() {
-    return fromUserId;
+  public long getMenteeUserId() {
+    return menteeUserId;
   }
 
-  public long getToUserId() {
-    return toUserId;
+  public long getMentorUserId() {
+    return mentorUserId;
   }
 
   public Status getStatus() {

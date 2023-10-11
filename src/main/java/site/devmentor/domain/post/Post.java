@@ -7,8 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.exception.UnauthorizedAccessException;
@@ -45,9 +44,9 @@ public class Post extends BaseEntity {
     this.content = content;
   }
 
-  public static Post create(AuthenticatedUser authUser, PostCreateUpdateRequest postCreateUpdateRequest) {
+  public static Post create(AppUser authUser, PostCreateUpdateRequest postCreateUpdateRequest) {
     return Post.builder()
-            .userPid(authUser.userPid())
+            .userPid(authUser.pid())
             .title(postCreateUpdateRequest.title())
             .content(postCreateUpdateRequest.content())
             .build();

@@ -3,7 +3,7 @@ package site.devmentor.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.post.PostService;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.auth.post.AuthorAccessOnly;
 import site.devmentor.dto.ResponseUtil;
@@ -27,7 +27,7 @@ public class PostController {
 
   @PostMapping
   public ResponseEntity<?> create(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody PostCreateUpdateRequest postCreateUpdateRequest) {
     PostCreateResponse postCreateResponse = postService.create(authUser, postCreateUpdateRequest);
     return ResponseEntity
@@ -54,7 +54,7 @@ public class PostController {
 
   @PostMapping("/{id}/comments")
   public ResponseEntity<CommentCreateResponse> replyComment(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody CommentDto commentDto,
           @PathVariable long id
   ) {
@@ -65,7 +65,7 @@ public class PostController {
   // 실제 postId 를 받아서 어떤 검증을 한다?.. 매번 댓글 삭제할 때마다 post 의 삭제여부를 검사 후 삭제한다.?
   @PatchMapping("/{postId}/comments/{commentId}")
   public ResponseEntity<CommentUpdateResponse> updateComment(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody CommentDto commentDto,
           @PathVariable(name = "postId") long postId,
           @PathVariable(name = "commentId") long commentId

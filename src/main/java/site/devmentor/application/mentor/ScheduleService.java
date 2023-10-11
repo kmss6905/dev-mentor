@@ -2,15 +2,15 @@ package site.devmentor.application.mentor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
 import site.devmentor.domain.mentor.schedule.Schedule;
 import site.devmentor.domain.mentor.schedule.ScheduleRepository;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
-import site.devmentor.dto.mentor.schedule.MentorScheduleResponse;
+import site.devmentor.dto.mentor.schedule.ScheduleRequest;
+import site.devmentor.dto.mentor.schedule.ScheduleResponse;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 
 @Service
@@ -25,16 +25,17 @@ public class ScheduleService {
     this.userRepository = userRepository;
   }
 
-  public MentorScheduleResponse create(AuthenticatedUser authUser, MentorScheduleDto mentorScheduleDto) {
-    MentorRequest mentorRequest = findMentorRequest(mentorScheduleDto.requestId());
-    User mentee = findUser(mentorRequest.getFromUserId());
-    User mentor = findUser(authUser.userPid());
-    Schedule schedule = Schedule.create(mentor, mentee, mentorRequest, mentorScheduleDto);
-    Schedule save = scheduleRepository.save(schedule);
-    return new MentorScheduleResponse(save.getId());
+  @Transactional
+  public ScheduleResponse createSchedule(AppUser appUser, ScheduleRequest scheduleRequest) {
+    MentorRequest mentorRequest = findRequest(scheduleRequest.requestId());
+    User mentee = findUser(mentorRequest.getMenteeUserId());
+    User mentor = findUser(appUser.pid());
+    Schedule schedule = scheduleRequest.toSchedule(mentor, mentee, mentorRequest);
+    Schedule savedSchedule = scheduleRepository.save(schedule);
+    return ScheduleResponse.of(savedSchedule);
   }
 
-  private MentorRequest findMentorRequest(long requestId) {
+  private MentorRequest findRequest(long requestId) {
     return mentorRequestRepository.findById(requestId).orElseThrow(IllegalStateException::new);
   }
 
@@ -43,7 +44,7 @@ public class ScheduleService {
   }
 
   @Transactional
-  public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto, long id) {
+  public void update(AppUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto, long id) {
     Schedule schedule = findSchedule(id);
     schedule.update(authUser, mentorScheduleUpdateDto);
   }
@@ -54,7 +55,7 @@ public class ScheduleService {
   }
 
   @Transactional
-  public void delete(AuthenticatedUser authUser, long id) {
+  public void delete(AppUser authUser, long id) {
     Schedule schedule = findSchedule(id);
     schedule.delete(authUser);
   }

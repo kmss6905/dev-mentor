@@ -2,7 +2,7 @@ package site.devmentor.application.mentor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.info.MentorInfoRepository;
 import site.devmentor.domain.mentor.request.MentorRequest;
@@ -24,7 +24,7 @@ public class MentorRequestService {
   }
 
   @Transactional
-  public void request(AuthenticatedUser authUser, MentorRequestDto mentorRequestDto) {
+  public void request(AppUser authUser, MentorRequestDto mentorRequestDto) {
     MentorInfo mentorInfo = findMentorInfo(mentorRequestDto);
     MentorRequest mentorRequest = MentorRequest.create(authUser, mentorRequestDto);
     saveMentorRequest(mentorRequest);
@@ -40,7 +40,7 @@ public class MentorRequestService {
   }
 
   @Transactional
-  public void delete(AuthenticatedUser authUser, long id) {
+  public void delete(AppUser authUser, long id) {
     MentorRequest mentorRequest = findMentorRequest(id);
     mentorRequest.verifyCanDelete(authUser);
     mentorRequestRepository.deleteById(id);
@@ -52,7 +52,7 @@ public class MentorRequestService {
   }
 
   @Transactional
-  public void update(AuthenticatedUser authUser, MentorRequestStatusDto requestStatus, long id) {
+  public void update(AppUser authUser, MentorRequestStatusDto requestStatus, long id) {
     MentorRequest mentorRequest = findMentorRequest(id);
     mentorRequest.changeStatus(authUser, requestStatus);
   }

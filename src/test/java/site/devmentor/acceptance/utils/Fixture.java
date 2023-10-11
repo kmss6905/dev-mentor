@@ -6,13 +6,18 @@ import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.request.Memo;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
+import site.devmentor.domain.mentor.schedule.ScheduleDetail;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailMemo;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailTime;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleMenteeMemo;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleMentorMemo;
 import site.devmentor.domain.post.Post;
 import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDetailDto;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
+import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
+import site.devmentor.dto.mentor.schedule.ScheduleRequest;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.user.request.UserCreateRequest;
@@ -62,25 +67,38 @@ public class Fixture {
           .build();
 
   public static MentorRequest MENTOR_REQUEST = MentorRequest.builder()
-          .fromUserId(2L)
-          .toUserId(1L)
+          .mentorUserId(2L)
+          .menteeUserId(1L)
           .status(Status.WAITING)
           .memo(new Memo("memo"))
           .build();
 
   public static MentorRequest MENTOR_REQUEST_ACCEPTED = MentorRequest.builder()
-          .fromUserId(2L)
-          .toUserId(1L)
+          .menteeUserId(2L)
+          .mentorUserId(1L)
           .memo(new Memo("memo"))
           .status(Status.ACCEPTED)
           .build();
 
   public static MentorRequest MENTOR_REQUEST_DENIED = MentorRequest.builder()
-          .fromUserId(2L)
-          .toUserId(1L)
+          .menteeUserId(2L)
+          .mentorUserId(1L)
           .memo(new Memo("memo"))
           .status(Status.DENIED)
           .build();
+
+  public static ScheduleDetail SCHEDULE_DETAIL = ScheduleDetail.builder()
+          .title("title")
+          .memo(ScheduleDetailMemo.create(
+                  ScheduleMentorMemo.from("mentorMemo"),
+                  ScheduleMenteeMemo.from("menteeMemo")
+          )).time(ScheduleDetailTime
+                  .of(
+                          LocalDateTime.of(2023, 1, 1, 0, 0),
+                          LocalDateTime.of(2023, 1, 10, 0, 0))
+          )
+      .build();
+
   public static PostCreateUpdateRequest MAKE_POST_REQUEST = new PostCreateUpdateRequest("title", "content");
 
   public static UserCreateRequest MAKE_DUPLICATED_ID_USER_REQUEST =
@@ -99,7 +117,7 @@ public class Fixture {
 
   public static MentorRequestStatusDto MAKE_UPDATE_MENTOR_REQUEST_TO_ACCEPTED = new MentorRequestStatusDto(Status.ACCEPTED);
 
-  public static MentorScheduleDto MAKE_SCHEDULE_REQUEST = new MentorScheduleDto(
+  public static ScheduleRequest MAKE_SCHEDULE_REQUEST = new ScheduleRequest(
           1L, "title", LocalDateTime.of(2023, 1, 1, 0, 0), LocalDateTime.of(2023,1,10,0,0), "memo"
   );
 
@@ -107,8 +125,14 @@ public class Fixture {
           "update_title", "update_memo", LocalDateTime.of(2023, 1, 10, 0, 0), LocalDateTime.of(2023, 1, 20, 0, 0)
   );
 
-  public static MentorScheduleDetailDto MAKE_SCHEDULE_DETAIL_REQUEST = new MentorScheduleDetailDto(
-          "detail_title", LocalDateTime.of(2023, 1, 1, 1, 0), LocalDateTime.of(2023, 1, 1, 2, 0), "menteeMemo", "mentorMemo"
+  public static ScheduleDetailRequest MAKE_SCHEDULE_DETAIL_REQUEST = new ScheduleDetailRequest(
+          "detail_title", LocalDateTime.of(2023, 1,
+          1, 1, 0), LocalDateTime.of(2023, 1, 1, 2, 0), "menteeMemo", "mentorMemo"
+  );
+
+  public static ScheduleDetailRequest MAKE_SCHEDULE_DETAIL_UPDATE_REQUEST = new ScheduleDetailRequest(
+          "update_detail_title", LocalDateTime.of(2023, 1,
+          1, 10, 0), LocalDateTime.of(2023, 1, 1, 11, 0), "updateMenteeMemo", "updateMentorMemo"
   );
 
 }
