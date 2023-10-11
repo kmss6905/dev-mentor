@@ -7,6 +7,7 @@ import site.devmentor.application.mentor.ScheduleDetailService;
 import site.devmentor.application.mentor.ScheduleService;
 import site.devmentor.auth.AppUser;
 import site.devmentor.auth.LoginUser;
+import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailStatus;
 import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.mentor.schedule.*;
@@ -26,7 +27,7 @@ public class ScheduleController {
   @PostMapping
   public ResponseEntity<ScheduleResponse> createSchedule(
       @LoginUser AppUser appUser,
-      @RequestBody ScheduleRequest scheduleRequest
+      @Valid @RequestBody ScheduleRequest scheduleRequest
   ) {
     return ResponseEntity.ok(scheduleService.createSchedule(appUser, scheduleRequest));
   }
@@ -41,11 +42,11 @@ public class ScheduleController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> removeSchedule(
+  public ResponseEntity<Void> removeSchedule(
       @LoginUser AppUser authUser,
       @PathVariable long id) {
     scheduleService.delete(authUser, id);
-    return ResponseUtil.ok();
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/{id}/details")
@@ -74,5 +75,14 @@ public class ScheduleController {
   ) {
     scheduleDetailService.deleteDetail(appUser, detailId);
     return ResponseEntity.noContent().build();
+  }
+
+  @PatchMapping("/details/{detailId}/status")
+  public ResponseEntity<ScheduleDetailStatusUpdateResponse> changeDetailStatus(
+      @LoginUser AppUser appUser,
+      @PathVariable long detailId,
+      @Valid @RequestBody ScheduleDetailStatusRequest detailStatusRequest
+  ) {
+    return ResponseEntity.ok(scheduleDetailService.updateDetailStatus(detailStatusRequest, appUser, detailId));
   }
 }

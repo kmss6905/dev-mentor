@@ -1,5 +1,6 @@
 package site.devmentor.application.mentor;
 
+import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AppUser;
@@ -7,10 +8,7 @@ import site.devmentor.domain.mentor.schedule.Schedule;
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
 import site.devmentor.domain.mentor.schedule.ScheduleDetailRepository;
 import site.devmentor.domain.mentor.schedule.ScheduleRepository;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailCreateResponse;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailUpdateResponse;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailUpdateRequest;
+import site.devmentor.dto.mentor.schedule.*;
 import site.devmentor.exception.UnauthorizedAccessException;
 import site.devmentor.exception.schedule.ScheduleDetailNotFoundException;
 import site.devmentor.exception.schedule.ScheduleNotFoundException;
@@ -48,6 +46,19 @@ public class ScheduleDetailService {
         return ScheduleDetailUpdateResponse.of(scheduleDetail);
     }
 
+    @Transactional
+    public void deleteDetail(AppUser appUser, long detailId) {
+        final ScheduleDetail detail = findDetailAuthorOf(detailId, appUser);
+        detail.delete();
+    }
+
+    @Transactional
+    public ScheduleDetailStatusUpdateResponse updateDetailStatus(ScheduleDetailStatusRequest detailStatusRequest, AppUser appUser, long detailId) {
+        ScheduleDetail detail = findDetailAuthorOf(detailId, appUser);
+        detail.updateStatus(detailStatusRequest.status());
+        return ScheduleDetailStatusUpdateResponse.from(detail);
+    }
+
     private ScheduleDetail findDetailAuthorOf(long detailId, AppUser appUser) {
         final ScheduleDetail detail = findDetail(detailId);
         if (!detail.isScheduleAuthor(appUser)) {
@@ -64,11 +75,5 @@ public class ScheduleDetailService {
     private Schedule findSchedule(long scheduleId) {
         return scheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new ScheduleNotFoundException(String.valueOf(scheduleId)));
-    }
-
-    @Transactional
-    public void deleteDetail(AppUser appUser, long detailId) {
-        final ScheduleDetail detail = findDetailAuthorOf(detailId, appUser);
-        detail.delete();
     }
 }

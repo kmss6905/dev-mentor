@@ -14,6 +14,7 @@ import site.devmentor.domain.mentor.schedule.vo.*;
 import site.devmentor.exception.schedule.ScheduleDetailContentValidateException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Table(name = "MENTORING_SCHEDULE_DETAIL")
 @Entity
@@ -108,5 +109,11 @@ public class ScheduleDetail extends BaseEntity {
 
     public ScheduleDetailStatus getStatus() {
         return status;
+    }
+
+    public void updateStatus(ScheduleDetailStatus status) {
+        if (Objects.nonNull(status)) {
+            this.status = status;
+        }
     }
 }
