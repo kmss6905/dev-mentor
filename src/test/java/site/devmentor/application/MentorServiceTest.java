@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import site.devmentor.application.mentor.MentorRequestService;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.info.MentorInfoRepository;
 import site.devmentor.domain.mentor.request.MentorRequestRepository;
@@ -56,7 +56,7 @@ public class MentorServiceTest {
     for (int i = 0; i < threadCount; i++) { // 100번의 요청 시행
       executorService.submit(() -> {
         try {
-          mentorRequestService.request(new AuthenticatedUser(1L), mentorRequestDto); // 멘토 요청
+          mentorRequestService.request(new AppUser(1L), mentorRequestDto); // 멘토 요청
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
@@ -90,7 +90,7 @@ public class MentorServiceTest {
     for (int i = 0; i < threadCount; i++) { // 10_000번의 요청 시행
       executorService.submit(() -> {
         try {
-          mentorRequestService.request(new AuthenticatedUser(1L), mentorRequestDto); // 멘토 요청
+          mentorRequestService.request(new AppUser(1L), mentorRequestDto); // 멘토 요청
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {

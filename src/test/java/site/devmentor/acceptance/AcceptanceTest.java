@@ -1,5 +1,6 @@
 package site.devmentor.acceptance;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -39,6 +40,10 @@ public class AcceptanceTest {
             .webAppContextSetup(context)
             .apply(SecurityMockMvcConfigurers.springSecurity())
             .build();
+  }
+
+  protected String toBody(Object o) throws JsonProcessingException {
+    return this.objectMapper.writeValueAsString(o);
   }
 
   @BeforeEach

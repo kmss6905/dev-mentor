@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.user.request.UserCreateRequest;
@@ -65,20 +65,20 @@ public class UserService {
     }
   }
 
-  public UserProfileResponse updateProfile(AuthenticatedUser authUser, UserProfileRequest profileRequest) {
+  public UserProfileResponse updateProfile(AppUser authUser, UserProfileRequest profileRequest) {
     User user = findUser(authUser);
     user.updateProfile(profileRequest);
     return UserProfileResponse.from(user);
   }
 
-  public void deleteProfile(AuthenticatedUser authUser) {
+  public void deleteProfile(AppUser authUser) {
     User user = findUser(authUser);
     user.deleteProfile();
   }
 
 
-  private User findUser(AuthenticatedUser authUser) {
-    return userRepository.findById(authUser.userPid())
-            .orElseThrow(() -> new UserNotFoundException(String.valueOf(authUser.userPid())));
+  private User findUser(AppUser authUser) {
+    return userRepository.findById(authUser.pid())
+            .orElseThrow(() -> new UserNotFoundException(String.valueOf(authUser.pid())));
   }
 }

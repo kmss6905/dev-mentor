@@ -3,7 +3,7 @@ package site.devmentor.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.devmentor.application.mentor.MentorRequestService;
-import site.devmentor.auth.AuthenticatedUser;
+import site.devmentor.auth.AppUser;
 import site.devmentor.auth.LoginUser;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.mentor.MentorRequestDto;
@@ -21,7 +21,7 @@ public class MentorRequestController {
 
   @PostMapping
   public ResponseEntity<?> createMentorRequest(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody MentorRequestDto mentorRequestDto
   ) {
     mentorRequestService.request(authUser, mentorRequestDto);
@@ -30,7 +30,7 @@ public class MentorRequestController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteMentorRequest(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @PathVariable long id
   ) {
     mentorRequestService.delete(authUser, id);
@@ -39,7 +39,7 @@ public class MentorRequestController {
 
   @PatchMapping("/{id}/status")
   public ResponseEntity<?> updateStatus(
-          @LoginUser AuthenticatedUser authUser,
+          @LoginUser AppUser authUser,
           @RequestBody MentorRequestStatusDto requestStatus,
           @PathVariable long id
   ) {

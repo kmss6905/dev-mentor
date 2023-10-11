@@ -14,7 +14,7 @@ import site.devmentor.domain.mentor.schedule.Schedule;
 import site.devmentor.domain.mentor.schedule.ScheduleRepository;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
+import site.devmentor.dto.mentor.schedule.ScheduleRequest;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 
 import java.time.LocalDateTime;
@@ -45,8 +45,8 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
   @Test
   @WithMockUser("1")
   void 스케줄_생성_성공() throws Exception {
-    MentorScheduleDto mentorScheduleDto = Fixture.MAKE_SCHEDULE_REQUEST;
-    String body = objectMapper.writeValueAsString(mentorScheduleDto);
+    ScheduleRequest scheduleRequest = Fixture.MAKE_SCHEDULE_REQUEST;
+    String body = objectMapper.writeValueAsString(scheduleRequest);
 
     mockMvc.perform(post("/api/mentor/schedules")
             .content(body)
@@ -56,8 +56,8 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
 
   @Test
   void 비로그인_스케쥴_생성_실패() throws Exception {
-    MentorScheduleDto mentorScheduleDto = Fixture.MAKE_SCHEDULE_REQUEST;
-    String body = objectMapper.writeValueAsString(mentorScheduleDto);
+    ScheduleRequest scheduleRequest = Fixture.MAKE_SCHEDULE_REQUEST;
+    String body = objectMapper.writeValueAsString(scheduleRequest);
 
     mockMvc.perform(post("/api/mentor/schedules")
             .content(body)
@@ -79,7 +79,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
             .startTime(LocalDateTime.of(2023, 1, 1, 0, 0))
             .endTime(LocalDateTime.of(2023, 1, 10, 0, 0))
             .request(mentorRequest)
-            .mentor(mentor)
+            .author(mentor)
             .mentee(mentee)
             .build();
     scheduleRepository.saveAndFlush(schedule);
@@ -115,7 +115,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
             .startTime(LocalDateTime.of(2023, 1, 1, 0, 0))
             .endTime(LocalDateTime.of(2023, 1, 10, 0, 0))
             .request(mentorRequest)
-            .mentor(mentor)
+            .author(mentor)
             .mentee(mentee)
             .build();
     scheduleRepository.saveAndFlush(schedule);
@@ -147,7 +147,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
             .startTime(LocalDateTime.of(2023, 1, 1, 0, 0))
             .endTime(LocalDateTime.of(2023, 1, 10, 0, 0))
             .request(mentorRequest)
-            .mentor(mentor)
+            .author(mentor)
             .mentee(mentee)
             .build();
     scheduleRepository.saveAndFlush(schedule);
@@ -177,7 +177,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
             .startTime(LocalDateTime.of(2023, 1, 1, 0, 0))
             .endTime(LocalDateTime.of(2023, 1, 10, 0, 0))
             .request(mentorRequest)
-            .mentor(mentor)
+            .author(mentor)
             .mentee(mentee)
             .build();
     scheduleRepository.saveAndFlush(schedule);
@@ -203,7 +203,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
             .startTime(LocalDateTime.of(2023, 1, 1, 0, 0))
             .endTime(LocalDateTime.of(2023, 1, 10, 0, 0))
             .request(mentorRequest)
-            .mentor(mentor)
+            .author(mentor)
             .mentee(mentee)
             .build();
     scheduleRepository.saveAndFlush(schedule);

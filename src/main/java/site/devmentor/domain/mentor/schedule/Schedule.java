@@ -1,14 +1,14 @@
 package site.devmentor.domain.mentor.schedule;
 
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-import site.devmentor.auth.AuthenticatedUser;
+import org.springframework.transaction.annotation.Transactional;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
@@ -16,13 +16,16 @@ import site.devmentor.domain.mentor.schedule.vo.Content;
 import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailTime;
 import site.devmentor.domain.mentor.schedule.vo.ScheduleTime;
 import site.devmentor.domain.user.User;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDto;
+import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
+import site.devmentor.dto.mentor.schedule.ScheduleRequest;
 import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
 import site.devmentor.exception.UnauthorizedAccessException;
+import site.devmentor.exception.schedule.ScheduleDetailNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Table(name = "MENTORING_SCHEDULE")
 @Entity
@@ -40,7 +43,7 @@ public class Schedule extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.SET_NULL)
   @JoinColumn(name = "mentor_id")
-  private User mentor;
+  private User author;
 
   @Embedded
   private Content content;
@@ -48,8 +51,7 @@ public class Schedule extends BaseEntity {
   @Embedded
   private ScheduleTime time;
 
-  @OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true)
-  @JoinColumn(name = "id", referencedColumnName = "id")
+  @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
   private List<ScheduleDetail> details = new ArrayList<>();
 
   @NotNull
@@ -65,27 +67,33 @@ public class Schedule extends BaseEntity {
   private MentorRequest request;
 
   @Builder
-  private Schedule(final User mentor, final User mentee, final MentorRequest request, final LocalDateTime startTime, final LocalDateTime endTime, final String title, final String memo) {
+  private Schedule(final User author, final User mentee, final MentorRequest request, final LocalDateTime startTime, final LocalDateTime endTime, final String title, final String memo) {
+    verifyOwner(request, author);
     verifyRequestNotNull(request);
     verifyOnlyForAcceptedRequest(request);
-    verifyMentorAndMentee(mentor, mentee);
-    verifyOwner(request, mentor);
-    this.mentor = mentor;
+    verifyMentorAndMentee(author, mentee);
+    this.author = author;
     this.mentee = mentee;
     this.request = request;
     this.content = new Content(title, memo);
     this.time = new ScheduleTime(startTime, endTime);
   }
-
   private void verifyOwner(MentorRequest request, User mentor) {
-    if (request.getToUserId() != mentor.getId()) {
+    if (request.getMentorUserId() != mentor.getId()) {
       throw new UnauthorizedAccessException();
     }
   }
 
+  public boolean isAuthorOf(AppUser appUser) {
+    if (!Objects.nonNull(author)) {
+      throw new IllegalArgumentException();
+    }
+    return author.getId() == appUser.pid();
+  }
+
 
   private void verifyOnlyForAcceptedRequest(MentorRequest request) {
-    if(!request.getStatus().equals(Status.ACCEPTED)) {
+    if (!request.getStatus().equals(Status.ACCEPTED)) {
       throw new IllegalArgumentException();
     }
   }
@@ -106,39 +114,34 @@ public class Schedule extends BaseEntity {
     }
   }
 
-  public static Schedule create(final User mentor, final User mentee, final MentorRequest request, final MentorScheduleDto mentorScheduleDto) {
-    return Schedule.builder()
-            .mentee(mentee)
-            .mentor(mentor)
-            .startTime(mentorScheduleDto.startDate())
-            .endTime(mentorScheduleDto.endDate())
-            .title(mentorScheduleDto.title())
-            .memo(mentorScheduleDto.memo())
-            .request(request).build();
-  }
-
-  public void update(AuthenticatedUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto) {
+  public void update(AppUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto) {
     checkOwner(authUser);
     this.content.update(mentorScheduleUpdateDto.title(), mentorScheduleUpdateDto.memo());
     this.time.update(mentorScheduleUpdateDto.startDate(), mentorScheduleUpdateDto.endDate());
   }
 
-  private void checkOwner(AuthenticatedUser authUser) {
-    if (this.mentor.getId() != authUser.userPid()) {
+  public void update(MentorScheduleUpdateDto mentorScheduleUpdateDto) {
+//    checkOwner(authUser);
+    this.content.update(mentorScheduleUpdateDto.title(), mentorScheduleUpdateDto.memo());
+    this.time.update(mentorScheduleUpdateDto.startDate(), mentorScheduleUpdateDto.endDate());
+  }
+
+  private site.devmentor.domain.mentor.schedule.ScheduleDetail findDetailById(long detailId) {
+    return details.stream().filter(it -> it.getId() == detailId)
+        .findAny()
+        .orElseThrow(() -> new ScheduleDetailNotFoundException("존재하지 않습니다. 스케줄 세부사항 번호 : " + detailId));
+  }
+
+  private void checkOwner(AppUser authUser) {
+    if (this.author.getId() != authUser.pid()) {
       throw new UnauthorizedAccessException();
     }
   }
 
-  public void delete(AuthenticatedUser authUser) {
+  public void delete(AppUser authUser) {
     checkOwner(authUser);
     this.deletedAt = LocalDateTime.now();
     this.isDeleted = true;
-  }
-
-  public void addDetail(ScheduleDetail scheduleDetail, AuthenticatedUser authUser) {
-    checkOwner(authUser);
-    verifyDetailTimeBetweenScheduleTime(scheduleDetail.getTime());
-    this.details.add(scheduleDetail);
   }
 
   private void verifyDetailTimeBetweenScheduleTime(ScheduleDetailTime detailTime) {
@@ -157,10 +160,6 @@ public class Schedule extends BaseEntity {
 
   private boolean isEndTimeNotInRange(ScheduleDetailTime detailTime) {
     return detailTime.getEndTime().isAfter(this.time.getEnd()) || detailTime.getEndTime().isBefore(this.time.getStart());
-  }
-
-  public List<ScheduleDetail> getDetails() {
-    return details;
   }
 
   public Content getContent() {

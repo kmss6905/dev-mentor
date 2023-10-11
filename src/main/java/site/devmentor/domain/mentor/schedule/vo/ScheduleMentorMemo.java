@@ -5,6 +5,8 @@ import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleMentorMemo {
@@ -16,5 +18,17 @@ public class ScheduleMentorMemo {
     ScheduleMentorMemo scheduleMentorMemo = new ScheduleMentorMemo();
     scheduleMentorMemo.content = content;
     return scheduleMentorMemo;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    ScheduleMentorMemo other = (ScheduleMentorMemo) obj;
+    return Objects.equals(this.content, other.content);
   }
 }

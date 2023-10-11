@@ -7,9 +7,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.mentor.schedule.vo.*;
-import site.devmentor.dto.mentor.schedule.MentorScheduleDetailDto;
 import site.devmentor.exception.schedule.ScheduleDetailContentValidateException;
 
 import java.time.LocalDateTime;
@@ -41,27 +41,19 @@ public class ScheduleDetail extends BaseEntity {
   @Column(name = "is_deleted")
   private boolean isDeleted = false;
 
+  @ManyToOne
+  @JoinColumn(name = "schedule_id")
+  private Schedule schedule;
+
   @Builder
-  private ScheduleDetail(final String title, final ScheduleDetailMemo memo, final ScheduleDetailTime time) {
-    verifyTitleNotEmpty(title);
+  private ScheduleDetail(final String title, final ScheduleDetailMemo memo, final ScheduleDetailTime time, final Schedule schedule) {
     verifyMemoNotNull(memo);
+    verifyTitleNotNull(title);
     verifyTimeNotNull(time);
     this.memo = memo;
     this.title = title;
     this.time = time;
-    this.status = ScheduleDetailStatus.PENDING;
-  }
-
-  public static ScheduleDetail create(MentorScheduleDetailDto dto) {
-    ScheduleMenteeMemo menteeMemo = ScheduleMenteeMemo.from(dto.menteeMemo());
-    ScheduleMentorMemo mentorMemo = ScheduleMentorMemo.from(dto.mentorMemo());
-    ScheduleDetailMemo detailMemo = ScheduleDetailMemo.create(mentorMemo, menteeMemo);
-    ScheduleDetailTime detailTime = ScheduleDetailTime.create(dto.startDate(), dto.endDate());
-    return ScheduleDetail.builder()
-            .memo(detailMemo)
-            .time(detailTime)
-            .title(dto.title())
-            .build();
+    this.schedule = schedule;
   }
 
   private void verifyTimeNotNull(ScheduleDetailTime time) {
@@ -76,13 +68,35 @@ public class ScheduleDetail extends BaseEntity {
     }
   }
 
-  private void verifyTitleNotEmpty(String title) {
+  private void verifyTitleNotNull(String title) {
     if (title == null || title.trim().isEmpty()) {
       throw new ScheduleDetailContentValidateException("title can't not be empty");
     }
   }
 
+  public void update(ScheduleDetail detail) {
+    this.memo = detail.memo;
+    this.time = detail.time;
+    this.title = detail.title;
+  }
+
+   public boolean isScheduleAuthor(AppUser appUser) {
+     return this.schedule.isAuthorOf(appUser);
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
   public ScheduleDetailTime getTime() {
     return time;
+  }
+
+  public ScheduleDetailMemo getMemo() {
+    return memo;
+  }
+
+  public ScheduleDetailStatus getStatus() {
+    return status;
   }
 }
