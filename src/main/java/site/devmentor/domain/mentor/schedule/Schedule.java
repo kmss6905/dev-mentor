@@ -1,25 +1,25 @@
 package site.devmentor.domain.mentor.schedule;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AppUser;
 import site.devmentor.domain.BaseEntity;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
+import site.devmentor.domain.mentor.review.Review;
 import site.devmentor.domain.mentor.schedule.vo.Content;
 import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailTime;
 import site.devmentor.domain.mentor.schedule.vo.ScheduleTime;
 import site.devmentor.domain.user.User;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
-import site.devmentor.dto.mentor.schedule.ScheduleRequest;
-import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
+import site.devmentor.dto.mentor.schedule.ScheduleUpdateDto;
 import site.devmentor.exception.UnauthorizedAccessException;
+import site.devmentor.exception.review.ReviewAlreadyExistedException;
 import site.devmentor.exception.schedule.ScheduleDetailNotFoundException;
 
 import java.time.LocalDateTime;
@@ -65,6 +65,9 @@ public class Schedule extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "request_id", nullable = false)
   private MentorRequest request;
+
+  @OneToOne(mappedBy = "schedule", cascade = CascadeType.ALL)
+  private Review review;
 
   @Builder
   private Schedule(final User author, final User mentee, final MentorRequest request, final LocalDateTime startTime, final LocalDateTime endTime, final String title, final String memo) {
@@ -114,22 +117,10 @@ public class Schedule extends BaseEntity {
     }
   }
 
-  public void update(AppUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto) {
+  public void update(AppUser authUser, ScheduleUpdateDto scheduleUpdateDto) {
     checkOwner(authUser);
-    this.content.update(mentorScheduleUpdateDto.title(), mentorScheduleUpdateDto.memo());
-    this.time.update(mentorScheduleUpdateDto.startDate(), mentorScheduleUpdateDto.endDate());
-  }
-
-  public void update(MentorScheduleUpdateDto mentorScheduleUpdateDto) {
-//    checkOwner(authUser);
-    this.content.update(mentorScheduleUpdateDto.title(), mentorScheduleUpdateDto.memo());
-    this.time.update(mentorScheduleUpdateDto.startDate(), mentorScheduleUpdateDto.endDate());
-  }
-
-  private site.devmentor.domain.mentor.schedule.ScheduleDetail findDetailById(long detailId) {
-    return details.stream().filter(it -> it.getId() == detailId)
-        .findAny()
-        .orElseThrow(() -> new ScheduleDetailNotFoundException("존재하지 않습니다. 스케줄 세부사항 번호 : " + detailId));
+    this.content.update(scheduleUpdateDto.title(), scheduleUpdateDto.memo());
+    this.time.update(scheduleUpdateDto.startDate(), scheduleUpdateDto.endDate());
   }
 
   private void checkOwner(AppUser authUser) {
@@ -168,5 +159,20 @@ public class Schedule extends BaseEntity {
 
   public ScheduleTime getTime() {
     return time;
+  }
+
+  public void addReview(Review review) {
+    if (Objects.nonNull(this.review)) {
+      throw new ReviewAlreadyExistedException();
+    }
+    this.review = review;
+  }
+
+  public boolean hasReview() {
+    return Objects.nonNull(review);
+  }
+
+  public boolean isMenteeOf(User author) {
+    return mentee.same(author);
   }
 }

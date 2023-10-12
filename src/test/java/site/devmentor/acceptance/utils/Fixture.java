@@ -6,6 +6,7 @@ import site.devmentor.domain.mentor.info.MentorInfo;
 import site.devmentor.domain.mentor.request.Memo;
 import site.devmentor.domain.mentor.request.MentorRequest;
 import site.devmentor.domain.mentor.request.Status;
+import site.devmentor.domain.mentor.review.Rate;
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
 import site.devmentor.domain.mentor.schedule.vo.*;
 import site.devmentor.domain.post.Post;
@@ -13,10 +14,11 @@ import site.devmentor.domain.user.User;
 import site.devmentor.dto.comment.CommentDto;
 import site.devmentor.dto.mentor.MentorRequestDto;
 import site.devmentor.dto.mentor.MentorRequestStatusDto;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailStatusRequest;
+import site.devmentor.dto.mentor.review.ReviewRequest;
+import site.devmentor.dto.mentor.schedule.detail.ScheduleDetailRequest;
+import site.devmentor.dto.mentor.schedule.detail.ScheduleDetailStatusRequest;
 import site.devmentor.dto.mentor.schedule.ScheduleRequest;
-import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
+import site.devmentor.dto.mentor.schedule.ScheduleUpdateDto;
 import site.devmentor.dto.post.request.PostCreateUpdateRequest;
 import site.devmentor.dto.user.request.UserCreateRequest;
 import site.devmentor.dto.user.request.UserProfileRequest;
@@ -119,7 +121,7 @@ public class Fixture {
           1L, "title", LocalDateTime.of(2023, 1, 1, 0, 0), LocalDateTime.of(2023,1,10,0,0), "memo"
   );
 
-  public static MentorScheduleUpdateDto MAKE_SCHEDULE_UPDATE_REQUEST = new MentorScheduleUpdateDto(
+  public static ScheduleUpdateDto MAKE_SCHEDULE_UPDATE_REQUEST = new ScheduleUpdateDto(
           "update_title", "update_memo", LocalDateTime.of(2023, 1, 10, 0, 0), LocalDateTime.of(2023, 1, 20, 0, 0)
   );
 
@@ -134,5 +136,6 @@ public class Fixture {
   );
 
   public static ScheduleDetailStatusRequest MAKE_SCHEDULE_DETAIL_STATUS_DOING_UPDATE_REQUEST = new ScheduleDetailStatusRequest(ScheduleDetailStatus.DOING);
+  public static ReviewRequest MAKE_REVIEW_REQUEST = new ReviewRequest("content", Rate.FIVE, 1L);
 
 }

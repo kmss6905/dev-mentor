@@ -1,6 +1,5 @@
 package site.devmentor.application.mentor;
 
-import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.devmentor.auth.AppUser;
@@ -8,7 +7,7 @@ import site.devmentor.domain.mentor.schedule.Schedule;
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
 import site.devmentor.domain.mentor.schedule.ScheduleDetailRepository;
 import site.devmentor.domain.mentor.schedule.ScheduleRepository;
-import site.devmentor.dto.mentor.schedule.*;
+import site.devmentor.dto.mentor.schedule.detail.*;
 import site.devmentor.exception.UnauthorizedAccessException;
 import site.devmentor.exception.schedule.ScheduleDetailNotFoundException;
 import site.devmentor.exception.schedule.ScheduleNotFoundException;

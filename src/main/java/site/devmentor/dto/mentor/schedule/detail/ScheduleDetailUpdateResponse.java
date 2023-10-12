@@ -1,4 +1,4 @@
-package site.devmentor.dto.mentor.schedule;
+package site.devmentor.dto.mentor.schedule.detail;
 
 import site.devmentor.domain.mentor.schedule.ScheduleDetail;
 

@@ -7,10 +7,9 @@ import site.devmentor.application.mentor.ScheduleDetailService;
 import site.devmentor.application.mentor.ScheduleService;
 import site.devmentor.auth.AppUser;
 import site.devmentor.auth.LoginUser;
-import site.devmentor.domain.mentor.schedule.vo.ScheduleDetailStatus;
-import site.devmentor.dto.Response;
 import site.devmentor.dto.ResponseUtil;
 import site.devmentor.dto.mentor.schedule.*;
+import site.devmentor.dto.mentor.schedule.detail.*;
 
 @RestController
 @RequestMapping("/api/mentor/schedules")
@@ -35,9 +34,9 @@ public class ScheduleController {
   @PatchMapping("/{id}")
   public ResponseEntity<?> editSchedule(
       @LoginUser AppUser authUser,
-      @Valid @RequestBody MentorScheduleUpdateDto mentorScheduleUpdateDto,
+      @Valid @RequestBody ScheduleUpdateDto scheduleUpdateDto,
       @PathVariable long id) {
-    scheduleService.update(authUser, mentorScheduleUpdateDto, id);
+    scheduleService.update(authUser, scheduleUpdateDto, id);
     return ResponseUtil.ok();
   }
 
