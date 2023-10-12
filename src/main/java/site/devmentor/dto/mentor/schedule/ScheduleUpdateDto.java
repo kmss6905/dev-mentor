@@ -1,13 +1,11 @@
 package site.devmentor.dto.mentor.schedule;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-public record MentorScheduleUpdateDto(
+public record ScheduleUpdateDto(
         @NotNull(message = "[title] 은 필수 입니다.")
         String title,
 

@@ -44,6 +44,9 @@ public class DatabaseCleaner implements InitializingBean {
       if (it.equals("SCHEDULEDETAIL")) {
         return "MENTORING_SCHEDULE_DETAIL";
       }
+      if (it.equals("REVIEW")) {
+        return "MENTOR_REVIEWS";
+      }
       return it;
     }).collect(Collectors.toList());
   }

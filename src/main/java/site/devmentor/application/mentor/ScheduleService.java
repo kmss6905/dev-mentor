@@ -11,7 +11,7 @@ import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.mentor.schedule.ScheduleRequest;
 import site.devmentor.dto.mentor.schedule.ScheduleResponse;
-import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
+import site.devmentor.dto.mentor.schedule.ScheduleUpdateDto;
 
 @Service
 public class ScheduleService {
@@ -44,9 +44,9 @@ public class ScheduleService {
   }
 
   @Transactional
-  public void update(AppUser authUser, MentorScheduleUpdateDto mentorScheduleUpdateDto, long id) {
+  public void update(AppUser authUser, ScheduleUpdateDto scheduleUpdateDto, long id) {
     Schedule schedule = findSchedule(id);
-    schedule.update(authUser, mentorScheduleUpdateDto);
+    schedule.update(authUser, scheduleUpdateDto);
   }
 
   private Schedule findSchedule(long id) {

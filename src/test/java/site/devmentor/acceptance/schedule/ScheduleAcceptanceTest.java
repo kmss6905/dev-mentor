@@ -15,7 +15,7 @@ import site.devmentor.domain.mentor.schedule.ScheduleRepository;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
 import site.devmentor.dto.mentor.schedule.ScheduleRequest;
-import site.devmentor.dto.mentor.schedule.MentorScheduleUpdateDto;
+import site.devmentor.dto.mentor.schedule.ScheduleUpdateDto;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -85,7 +85,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
     scheduleRepository.saveAndFlush(schedule);
 
     // when
-    MentorScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
+    ScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
     String body = objectMapper.writeValueAsString(updateDto);
 
 
@@ -121,7 +121,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
     scheduleRepository.saveAndFlush(schedule);
 
     // when
-    MentorScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
+    ScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
     String body = objectMapper.writeValueAsString(updateDto);
 
 
@@ -153,7 +153,7 @@ class ScheduleAcceptanceTest extends AcceptanceTest {
     scheduleRepository.saveAndFlush(schedule);
 
     // when
-    MentorScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
+    ScheduleUpdateDto updateDto = Fixture.MAKE_SCHEDULE_UPDATE_REQUEST;
     String body = objectMapper.writeValueAsString(updateDto);
 
 

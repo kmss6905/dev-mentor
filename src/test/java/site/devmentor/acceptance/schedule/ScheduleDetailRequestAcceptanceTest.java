@@ -18,7 +18,7 @@ import site.devmentor.domain.mentor.schedule.ScheduleRepository;
 import site.devmentor.domain.mentor.schedule.vo.*;
 import site.devmentor.domain.user.User;
 import site.devmentor.domain.user.UserRepository;
-import site.devmentor.dto.mentor.schedule.ScheduleDetailRequest;
+import site.devmentor.dto.mentor.schedule.detail.ScheduleDetailRequest;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
